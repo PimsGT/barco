@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="dark">
+<html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,19 +7,19 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
-      darkMode: 'class',
       theme: {
         extend: {
           colors: {
-            border: '#27272a',
-            background: '#09090b',
-            foreground: '#fafafa',
-            card: '#121215',
-            muted: '#27272a',
-            'muted-foreground': '#a1a1aa',
-            primary: '#10b981',
-            'primary-foreground': '#09090b',
-            danger: '#ef4444'
+            border: '#e2e8f0',
+            background: '#f8fafc',
+            foreground: '#0f172a',
+            card: '#ffffff',
+            muted: '#f1f5f9',
+            'muted-foreground': '#64748b',
+            primary: '#059669',
+            'primary-hover': '#047857',
+            'primary-foreground': '#ffffff',
+            danger: '#dc2626'
           }
         }
       }
@@ -29,113 +29,131 @@
   <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #09090b; color: #fafafa; }
+    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #0f172a; }
+
+    /* Estilos específicos para impressão do Documento Administrativo */
+    @media print {
+      body { background-color: #ffffff !important; color: #000000 !important; font-size: 11pt; }
+      header, .no-print, button, input, select { display: none !important; }
+      #relatorio-print { display: block !important; }
+      .print-border { border-color: #000000 !important; }
+    }
+    #relatorio-print { display: none; }
   </style>
 </head>
 <body class="min-h-screen bg-background text-foreground antialiased">
-  <header class="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur">
+  
+  <!-- Cabeçalho Web -->
+  <header class="sticky top-0 z-40 border-b border-border bg-white/90 shadow-sm backdrop-blur no-print">
     <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
       <div class="flex items-center gap-3">
-        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary ring-1 ring-primary/20">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-primary text-xl border border-emerald-200 shadow-sm">
           🚤
         </div>
         <div>
-          <h1 class="font-bold text-lg sm:text-xl">Barco Compartilhado</h1>
-          <p class="text-xs text-muted-foreground">Divisão de Gastos · Fausto & Leonardo</p>
+          <h1 class="font-bold text-lg sm:text-xl text-slate-900">Barco Compartilhado</h1>
+          <p class="text-xs text-muted-foreground">Prestação de Contas · Fausto & Leonardo</p>
         </div>
       </div>
       <div class="flex items-center gap-2">
-        <button onclick="copiarResumo()" class="rounded-lg border border-border bg-card px-3 py-1.5 text-xs font-medium hover:bg-muted transition">
-          Copiar resumo WhatsApp
+        <button onclick="exportarExcel()" class="rounded-lg border border-border bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 transition shadow-sm">
+          📊 Baixar Excel
         </button>
-        <button onclick="tentarAdicionar()" class="rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary/90 transition">
+        <button onclick="gerarRelatorioPDF()" class="rounded-lg border border-slate-300 bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-800 hover:bg-slate-200 transition shadow-sm">
+          📄 Gerar Documento PDF
+        </button>
+        <button onclick="copiarResumo()" class="rounded-lg border border-border bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 transition shadow-sm">
+          Copiar WhatsApp
+        </button>
+        <button onclick="tentarAdicionar()" class="rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary-hover transition shadow-sm">
           + Adicionar gasto
         </button>
       </div>
     </div>
   </header>
 
-  <main class="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6">
+  <!-- Painel Web Principal -->
+  <main class="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 no-print">
     <!-- Indicadores -->
     <section class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      <div class="rounded-xl border border-primary/40 bg-card p-5">
-        <p class="text-xs text-muted-foreground">Investimento total</p>
+      <div class="rounded-xl border border-emerald-200 bg-white p-5 shadow-sm">
+        <p class="text-xs font-medium text-muted-foreground uppercase tracking-wider">Investimento total</p>
         <p id="kpi-total" class="mt-2 text-2xl font-bold text-primary font-mono">R$ 0,00</p>
         <p id="kpi-qtd" class="mt-1 text-xs text-muted-foreground">0 itens</p>
       </div>
-      <div class="rounded-xl border border-border bg-card p-5">
-        <p class="text-xs text-muted-foreground">Fausto pagou</p>
-        <p id="kpi-fausto" class="mt-2 text-2xl font-bold font-mono">R$ 0,00</p>
+      <div class="rounded-xl border border-border bg-white p-5 shadow-sm">
+        <p class="text-xs font-medium text-muted-foreground uppercase tracking-wider">Fausto pagou</p>
+        <p id="kpi-fausto" class="mt-2 text-2xl font-bold text-slate-900 font-mono">R$ 0,00</p>
         <p id="kpi-fausto-perc" class="mt-1 text-xs text-muted-foreground">0% do total</p>
       </div>
-      <div class="rounded-xl border border-border bg-card p-5">
-        <p class="text-xs text-muted-foreground">Leonardo pagou</p>
-        <p id="kpi-leonardo" class="mt-2 text-2xl font-bold font-mono">R$ 0,00</p>
+      <div class="rounded-xl border border-border bg-white p-5 shadow-sm">
+        <p class="text-xs font-medium text-muted-foreground uppercase tracking-wider">Leonardo pagou</p>
+        <p id="kpi-leonardo" class="mt-2 text-2xl font-bold text-slate-900 font-mono">R$ 0,00</p>
         <p id="kpi-leonardo-perc" class="mt-1 text-xs text-muted-foreground">0% do total</p>
       </div>
-      <div class="rounded-xl border border-border bg-card p-5">
-        <p class="text-xs text-muted-foreground">Cota de cada um (50%)</p>
-        <p id="kpi-cota" class="mt-2 text-2xl font-bold font-mono">R$ 0,00</p>
+      <div class="rounded-xl border border-border bg-white p-5 shadow-sm">
+        <p class="text-xs font-medium text-muted-foreground uppercase tracking-wider">Cota de cada um (50%)</p>
+        <p id="kpi-cota" class="mt-2 text-2xl font-bold text-slate-900 font-mono">R$ 0,00</p>
         <p id="kpi-ticket" class="mt-1 text-xs text-muted-foreground">Média R$ 0,00</p>
       </div>
     </section>
 
     <!-- Equilíbrio e Maiores Gastos -->
     <div class="grid gap-6 lg:grid-cols-5">
-      <div class="rounded-xl border border-border bg-card p-6 lg:col-span-3">
-        <h2 class="text-base font-semibold">Equilíbrio entre os dois</h2>
+      <div class="rounded-xl border border-border bg-white p-6 shadow-sm lg:col-span-3">
+        <h2 class="text-base font-semibold text-slate-900">Equilíbrio financeiro</h2>
         <div class="mt-4 space-y-4">
-          <div class="h-4 w-full overflow-hidden rounded-full bg-muted">
-            <div id="progresso-fausto" class="h-full bg-primary transition-all duration-500" style="width: 50%"></div>
+          <div class="h-4 w-full overflow-hidden rounded-full bg-slate-100 border border-slate-200">
+            <div id="progresso-fausto" class="h-full bg-emerald-500 transition-all duration-500" style="width: 50%"></div>
           </div>
-          <div class="flex justify-between text-xs text-muted-foreground">
+          <div class="flex justify-between text-xs font-medium text-muted-foreground">
             <span id="label-perc-fausto">Fausto 50%</span>
             <span id="label-perc-leonardo">Leonardo 50%</span>
           </div>
-          <div id="box-acerto" class="rounded-lg border border-border bg-muted/40 p-4 text-sm leading-relaxed"></div>
+          <div id="box-acerto" class="rounded-lg border border-emerald-100 bg-emerald-50/70 p-4 text-sm text-slate-800 leading-relaxed"></div>
         </div>
       </div>
 
-      <div class="rounded-xl border border-border bg-card p-6 lg:col-span-2">
-        <h2 class="text-base font-semibold">Maiores gastos</h2>
-        <div id="lista-maiores" class="mt-4 space-y-3"></div>
+      <div class="rounded-xl border border-border bg-white p-6 shadow-sm lg:col-span-2">
+        <h2 class="text-base font-semibold text-slate-900">Maiores aportes</h2>
+        <div id="lista-maiores" class="mt-4 space-y-2.5"></div>
       </div>
     </div>
 
     <!-- Categorias -->
-    <div class="rounded-xl border border-border bg-card p-6">
-      <h2 class="text-base font-semibold">Gastos por categoria</h2>
+    <div class="rounded-xl border border-border bg-white p-6 shadow-sm">
+      <h2 class="text-base font-semibold text-slate-900">Gastos por categoria</h2>
       <div id="lista-categorias" class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"></div>
     </div>
 
     <!-- Tabela Geral -->
-    <div class="rounded-xl border border-border bg-card">
-      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-border p-4 sm:p-6">
+    <div class="rounded-xl border border-border bg-white shadow-sm overflow-hidden">
+      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-border p-4 sm:p-6 bg-slate-50/50">
         <div>
-          <h2 class="text-base font-semibold">Todos os gastos</h2>
+          <h2 class="text-base font-semibold text-slate-900">Todos os gastos</h2>
           <p id="tabela-contador" class="text-xs text-muted-foreground">0 itens</p>
         </div>
         <div class="flex flex-wrap items-center gap-2">
-          <input id="input-busca" oninput="filtrar()" type="text" placeholder="Buscar item ou categoria..." class="rounded-lg border border-border bg-background px-3 py-1.5 text-xs text-foreground focus:border-primary focus:outline-none sm:w-64" />
-          <select id="filtro-pessoa" onchange="filtrar()" class="rounded-lg border border-border bg-background px-3 py-1.5 text-xs text-foreground focus:border-primary focus:outline-none">
+          <input id="input-busca" oninput="filtrar()" type="text" placeholder="Buscar item ou categoria..." class="rounded-lg border border-border bg-white px-3 py-1.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none sm:w-64" />
+          <select id="filtro-pessoa" onchange="filtrar()" class="rounded-lg border border-border bg-white px-3 py-1.5 text-xs text-slate-900 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none">
             <option value="todos">Todos</option>
             <option value="Fausto">Fausto</option>
             <option value="Leonardo">Leonardo</option>
           </select>
-          <button onclick="restaurar()" title="Restaurar originais" class="rounded-lg border border-border bg-background p-1.5 text-muted-foreground hover:text-foreground">
+          <button onclick="restaurar()" title="Restaurar originais" class="rounded-lg border border-border bg-white p-1.5 text-slate-500 hover:text-slate-900 hover:bg-slate-50 shadow-sm">
             🔄
           </button>
         </div>
       </div>
       <div class="overflow-x-auto">
         <table class="w-full text-left text-sm">
-          <thead class="border-b border-border bg-muted/30 text-xs text-muted-foreground uppercase">
+          <thead class="border-b border-border bg-slate-50 text-xs font-semibold text-slate-600 uppercase tracking-wider">
             <tr>
-              <th class="px-4 py-3 sm:px-6">Item</th>
-              <th class="px-4 py-3">Categoria</th>
-              <th class="px-4 py-3">Quem pagou</th>
-              <th class="px-4 py-3 text-right">Valor</th>
-              <th class="px-4 py-3 text-center w-12">Ações</th>
+              <th class="px-4 py-3.5 sm:px-6">Item</th>
+              <th class="px-4 py-3.5">Categoria</th>
+              <th class="px-4 py-3.5">Quem pagou</th>
+              <th class="px-4 py-3.5 text-right">Valor</th>
+              <th class="px-4 py-3.5 text-center w-12">Ações</th>
             </tr>
           </thead>
           <tbody id="tabela-corpo" class="divide-y divide-border"></tbody>
@@ -144,31 +162,116 @@
     </div>
   </main>
 
+  <!-- DOCUMENTO ADMINISTRATIVO (Visível na impressão / exportação de PDF) -->
+  <div id="relatorio-print" class="p-8 max-w-4xl mx-auto font-sans">
+    <div class="border-b-2 border-slate-900 pb-4 mb-6">
+      <div class="flex justify-between items-start">
+        <div>
+          <h1 class="text-2xl font-bold uppercase tracking-wide text-slate-900">Relatório Administrativo de Prestação de Contas</h1>
+          <p class="text-sm text-slate-600 mt-1">Aquisição e Equipamento de Embarcação em Copropriedade (50% / 50%)</p>
+        </div>
+        <div class="text-right text-xs text-slate-500">
+          <p><strong>Emissão:</strong> <span id="doc-data-emissao"></span></p>
+          <p><strong>Status:</strong> Fechamento Provisório</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resumo dos Titulares -->
+    <div class="grid grid-cols-2 gap-4 mb-6 text-sm border border-slate-300 p-4 rounded bg-slate-50">
+      <div>
+        <p class="font-bold text-slate-800 border-b border-slate-200 pb-1 mb-2">Coproprietário A</p>
+        <p><strong>Nome:</strong> Fausto Tomazini</p>
+        <p><strong>Total aportado:</strong> <span id="doc-total-fausto" class="font-mono font-bold"></span></p>
+        <p><strong>Participação real:</strong> <span id="doc-perc-fausto"></span></p>
+      </div>
+      <div>
+        <p class="font-bold text-slate-800 border-b border-slate-200 pb-1 mb-2">Coproprietário B</p>
+        <p><strong>Nome:</strong> Leonardo Mattos de Aguiar</p>
+        <p><strong>Total aportado:</strong> <span id="doc-total-leo" class="font-mono font-bold"></span></p>
+        <p><strong>Participação real:</strong> <span id="doc-perc-leo"></span></p>
+      </div>
+    </div>
+
+    <!-- Indicador de Fechamento -->
+    <div class="mb-6 p-4 border border-slate-400 rounded bg-white">
+      <div class="flex justify-between items-center text-sm mb-2">
+        <span><strong>Investimento Global Consolidado:</strong></span>
+        <span id="doc-total-geral" class="font-mono font-bold text-base"></span>
+      </div>
+      <div class="flex justify-between items-center text-sm mb-2">
+        <span><strong>Cota Igualitária por Titular (50%):</strong></span>
+        <span id="doc-cota-individual" class="font-mono font-bold"></span>
+      </div>
+      <div class="border-t border-slate-200 pt-2 text-sm text-slate-800" id="doc-status-acerto"></div>
+    </div>
+
+    <!-- Tabela Detalhada Oficial -->
+    <div class="mb-8">
+      <h2 class="text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Detalhamento dos Itens e Comprovantes</h2>
+      <table class="w-full text-left text-xs border border-slate-300 border-collapse">
+        <thead>
+          <tr class="bg-slate-200 text-slate-800 border-b border-slate-300">
+            <th class="p-2 border-r border-slate-300 w-10 text-center">Nº</th>
+            <th class="p-2 border-r border-slate-300">Descrição do Item / Serviço</th>
+            <th class="p-2 border-r border-slate-300 w-44">Categoria</th>
+            <th class="p-2 border-r border-slate-300 w-28 text-center">Titular Responsável</th>
+            <th class="p-2 text-right w-32">Valor (R$)</th>
+          </tr>
+        </thead>
+        <tbody id="doc-tabela-corpo"></tbody>
+        <tfoot>
+          <tr class="bg-slate-100 font-bold border-t-2 border-slate-400">
+            <td colspan="4" class="p-2 text-right border-r border-slate-300">TOTAL GERAL ACUMULADO:</td>
+            <td id="doc-tabela-total" class="p-2 text-right font-mono"></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <!-- Assinaturas -->
+    <div class="pt-12 mt-12 border-t border-slate-300 text-xs text-slate-600">
+      <div class="grid grid-cols-2 gap-12 text-center">
+        <div>
+          <div class="border-b border-slate-400 mb-2"></div>
+          <p class="font-bold text-slate-800">FAUSTO TOMAZINI</p>
+          <p>Coproprietário</p>
+        </div>
+        <div>
+          <div class="border-b border-slate-400 mb-2"></div>
+          <p class="font-bold text-slate-800">LEONARDO MATTOS DE AGUIAR</p>
+          <p>Coproprietário</p>
+        </div>
+      </div>
+      <p class="text-center mt-8 text-[10px] text-slate-400">Documento gerado automaticamente pelo Sistema de Gestão Financeira de Copropriedade.</p>
+    </div>
+  </div>
+
   <!-- Modal Adicionar Gasto -->
-  <div id="modal-gasto" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/80 p-4">
-    <div class="w-full max-w-md rounded-2xl border border-border bg-card p-6 shadow-2xl">
-      <h3 class="font-bold text-lg border-b border-border pb-3">Novo gasto</h3>
+  <div id="modal-gasto" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 no-print">
+    <div class="w-full max-w-md rounded-2xl border border-border bg-white p-6 shadow-2xl">
+      <h3 class="font-bold text-lg text-slate-900 border-b border-border pb-3">Novo gasto</h3>
       <form id="form-gasto" onsubmit="salvarGasto(event)" class="mt-4 space-y-4">
         <div>
-          <label class="block text-xs font-medium text-muted-foreground mb-1">Item / Descrição</label>
-          <input id="form-item" required type="text" placeholder="Ex.: Motor de popa 40 HP" class="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Item / Descrição</label>
+          <input id="form-item" required type="text" placeholder="Ex.: Motor de popa 40 HP" class="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-slate-900 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none" />
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-medium text-muted-foreground mb-1">Valor (R$)</label>
-            <input id="form-valor" required placeholder="0,00" class="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none" />
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Valor (R$)</label>
+            <input id="form-valor" required placeholder="0,00" class="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-slate-900 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none" />
           </div>
           <div>
-            <label class="block text-xs font-medium text-muted-foreground mb-1">Quem pagou</label>
-            <select id="form-pessoa" class="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none">
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Quem pagou</label>
+            <select id="form-pessoa" class="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-slate-900 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none">
               <option value="Leonardo" selected>Leonardo</option>
               <option value="Fausto">Fausto</option>
             </select>
           </div>
         </div>
         <div>
-          <label class="block text-xs font-medium text-muted-foreground mb-1">Categoria</label>
-          <select id="form-categoria" class="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground focus:border-primary focus:outline-none">
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Categoria</label>
+          <select id="form-categoria" class="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-slate-900 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none">
             <option value="Embarcação">Embarcação</option>
             <option value="Motor" selected>Motor</option>
             <option value="Reboque / Transporte">Reboque / Transporte</option>
@@ -182,15 +285,15 @@
             <option value="Outros">Outros</option>
           </select>
         </div>
-        <div class="flex justify-end gap-2 pt-2 border-t border-border">
-          <button type="button" onclick="fecharModal()" class="rounded-lg px-4 py-2 text-xs font-medium text-muted-foreground hover:bg-muted">Cancelar</button>
-          <button type="submit" class="rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary/90">Salvar</button>
+        <div class="flex justify-end gap-2 pt-3 border-t border-border">
+          <button type="button" onclick="fecharModal()" class="rounded-lg px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 transition">Cancelar</button>
+          <button type="submit" class="rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary-hover transition shadow-sm">Salvar gasto</button>
         </div>
       </form>
     </div>
   </div>
 
-  <div id="toast" class="fixed bottom-4 right-4 z-50 hidden rounded-lg border border-border bg-card px-4 py-3 text-sm shadow-xl"></div>
+  <div id="toast" class="fixed bottom-4 right-4 z-50 hidden rounded-xl border border-border bg-white px-4 py-3 text-sm font-medium text-slate-800 shadow-xl no-print"></div>
 
   <script>
     const SENHA_MESTRE = "@Barco2026";
@@ -281,14 +384,14 @@
       const devedor = credor === "Fausto" ? "Leonardo" : "Fausto";
 
       document.getElementById("box-acerto").innerHTML = credor
-        ? `Para dividir 50/50, <strong>${devedor}</strong> precisa cobrir <strong class="text-primary">${formatBRL(diff)}</strong> diretamente a <strong>${credor}</strong> ou realizar <strong>${formatBRL(diff * 2)}</strong> em novos gastos.`
+        ? `Para dividir 50/50, <strong>${devedor}</strong> precisa cobrir <strong class="text-emerald-700">${formatBRL(diff)}</strong> diretamente a <strong>${credor}</strong> ou realizar <strong>${formatBRL(diff * 2)}</strong> em novos gastos.`
         : `As contas estão 100% equilibradas.`;
 
       const maiores = [...gastos].sort((a, b) => b.valor - a.valor).slice(0, 5);
       document.getElementById("lista-maiores").innerHTML = maiores.map(g => `
-        <div class="flex items-center justify-between text-sm py-1 border-b border-border/50">
-          <span class="truncate pr-2">${g.item} <span class="text-xs text-muted-foreground">(${g.pessoa})</span></span>
-          <span class="font-medium font-mono">${formatBRL(g.valor)}</span>
+        <div class="flex items-center justify-between text-sm py-1.5 border-b border-slate-100">
+          <span class="truncate pr-2 text-slate-800">${g.item} <span class="text-xs text-muted-foreground">(${g.pessoa})</span></span>
+          <span class="font-semibold font-mono text-slate-900">${formatBRL(g.valor)}</span>
         </div>
       `).join("") || '<p class="text-xs text-muted-foreground">Sem gastos.</p>';
 
@@ -299,13 +402,13 @@
       })).sort((a, b) => b.valor - a.valor);
 
       document.getElementById("lista-categorias").innerHTML = cats.map(c => `
-        <div class="rounded-lg border border-border/50 bg-background/50 p-3 space-y-2">
-          <div class="flex justify-between text-xs">
-            <span class="font-medium truncate">${c.categoria}</span>
+        <div class="rounded-lg border border-slate-200 bg-slate-50/70 p-3 space-y-2">
+          <div class="flex justify-between text-xs font-medium">
+            <span class="truncate text-slate-800">${c.categoria}</span>
             <span class="text-muted-foreground font-mono">${formatBRL(c.valor)} · ${c.perc.toFixed(1)}%</span>
           </div>
-          <div class="h-1.5 w-full overflow-hidden rounded-full bg-muted">
-            <div class="h-full bg-primary/70" style="width: ${c.perc}%"></div>
+          <div class="h-2 w-full overflow-hidden rounded-full bg-slate-200">
+            <div class="h-full bg-emerald-500" style="width: ${c.perc}%"></div>
           </div>
         </div>
       `).join("");
@@ -325,17 +428,17 @@
       document.getElementById("tabela-contador").innerText = `${lista.length} itens listados · Total ${formatBRL(lista.reduce((s, g) => s + g.valor, 0))}`;
 
       document.getElementById("tabela-corpo").innerHTML = lista.map(g => `
-        <tr class="hover:bg-muted/20 transition">
-          <td class="px-4 py-3 sm:px-6 font-medium">${g.item}</td>
+        <tr class="hover:bg-slate-50 transition">
+          <td class="px-4 py-3 sm:px-6 font-medium text-slate-900">${g.item}</td>
           <td class="px-4 py-3 text-muted-foreground text-xs">${g.categoria}</td>
           <td class="px-4 py-3">
-            <span class="inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ${g.pessoa === 'Fausto' ? 'bg-primary/10 text-primary border border-primary/20' : 'bg-muted text-foreground border border-border'}">
+            <span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${g.pessoa === 'Fausto' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-slate-100 text-slate-700 border border-slate-200'}">
               ${g.pessoa}
             </span>
           </td>
-          <td class="px-4 py-3 text-right font-medium font-mono">${formatBRL(g.valor)}</td>
+          <td class="px-4 py-3 text-right font-semibold font-mono text-slate-900">${formatBRL(g.valor)}</td>
           <td class="px-4 py-3 text-center">
-            <button onclick="removerGasto('${g.id}')" title="Excluir" class="text-muted-foreground hover:text-danger">🗑️</button>
+            <button onclick="removerGasto('${g.id}')" title="Excluir" class="text-slate-400 hover:text-danger transition">🗑️</button>
           </td>
         </tr>
       `).join("");
@@ -367,7 +470,7 @@
       salvar();
       render();
       fecharModal();
-      showToast(`${item} adicionado!`);
+      showToast(`${item} adicionado com sucesso!`);
     }
 
     function removerGasto(id) {
@@ -389,6 +492,77 @@
         render();
         showToast("Restaurado.");
       }
+    }
+
+    /* EXPORTAÇÃO: DOCUMENTO ADMINISTRATIVO EM PDF/IMPRESSÃO */
+    function gerarRelatorioPDF() {
+      const agora = new Date();
+      const dataFormatada = agora.toLocaleDateString("pt-BR") + " às " + agora.toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' });
+      document.getElementById("doc-data-emissao").innerText = dataFormatada;
+
+      const total = gastos.reduce((s, g) => s + g.valor, 0);
+      const fausto = gastos.filter(g => g.pessoa === "Fausto").reduce((s, g) => s + g.valor, 0);
+      const leo = gastos.filter(g => g.pessoa === "Leonardo").reduce((s, g) => s + g.valor, 0);
+      const cota = total / 2;
+      const percFausto = total > 0 ? (fausto / total) * 100 : 50;
+      const percLeo = 100 - percFausto;
+
+      document.getElementById("doc-total-fausto").innerText = formatBRL(fausto);
+      document.getElementById("doc-perc-fausto").innerText = `${percFausto.toFixed(1)}%`;
+      document.getElementById("doc-total-leo").innerText = formatBRL(leo);
+      document.getElementById("doc-perc-leo").innerText = `${percLeo.toFixed(1)}%`;
+
+      document.getElementById("doc-total-geral").innerText = formatBRL(total);
+      document.getElementById("doc-cota-individual").innerText = formatBRL(cota);
+
+      const diff = Math.abs(fausto - cota);
+      const credor = diff < 0.01 ? null : (fausto > cota ? "Fausto" : "Leonardo");
+      const devedor = credor === "Fausto" ? "Leonardo" : "Fausto";
+
+      document.getElementById("doc-status-acerto").innerHTML = credor
+        ? `<strong>Parecer de Compensação:</strong> Para equalização das participações em 50,00%, <strong>${devedor}</strong> apresenta débito compensatório de <strong>${formatBRL(diff)}</strong> perante <strong>${credor}</strong>, ou deverá assumir novos dispêndios no montante acumulado de <strong>${formatBRL(diff * 2)}</strong>.`
+        : `<strong>Parecer de Compensação:</strong> As contas encontram-se rigorosamente equalizadas (50,00% cada coproprietário).`;
+
+      const ordenados = [...gastos].sort((a, b) => b.valor - a.valor);
+      document.getElementById("doc-tabela-corpo").innerHTML = ordenados.map((g, idx) => `
+        <tr class="border-b border-slate-300 ${idx % 2 === 1 ? 'bg-slate-50' : 'bg-white'}">
+          <td class="p-2 border-r border-slate-300 text-center text-slate-500">${idx + 1}</td>
+          <td class="p-2 border-r border-slate-300 font-medium text-slate-900">${g.item}</td>
+          <td class="p-2 border-r border-slate-300 text-slate-600">${g.categoria}</td>
+          <td class="p-2 border-r border-slate-300 text-center font-semibold text-slate-800">${g.pessoa}</td>
+          <td class="p-2 text-right font-mono font-medium">${formatBRL(g.valor)}</td>
+        </tr>
+      `).join("");
+
+      document.getElementById("doc-tabela-total").innerText = formatBRL(total);
+
+      // Abre janela de impressão formatada
+      window.print();
+    }
+
+    /* EXPORTAÇÃO: PLANILHA EXCEL / CSV */
+    function exportarExcel() {
+      const cabecalho = ["Nº", "Item / Descricao", "Categoria", "Titular Responsavel", "Valor (R$)"];
+      const linhas = [...gastos].sort((a, b) => b.valor - a.valor).map((g, idx) => [
+        idx + 1,
+        `"${g.item.replace(/"/g, '""')}"`,
+        `"${g.categoria}"`,
+        `"${g.pessoa}"`,
+        g.valor.toFixed(2).replace(".", ",")
+      ]);
+
+      const total = gastos.reduce((s, g) => s + g.valor, 0);
+      linhas.push(["", '"TOTAL GERAL"', '""', '""', total.toFixed(2).replace(".", ",")]);
+
+      const csvContent = "\uFEFF" + [cabecalho.join(";"), ...linhas.map(l => l.join(";"))].join("\r\n");
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Prestacao_Contas_Barco_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast("Planilha gerada com sucesso!");
     }
 
     function copiarResumo() {
