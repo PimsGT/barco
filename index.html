@@ -1,362 +1,173 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Barco Compartilhado — Gastos de Fausto e Leonardo</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Divisão de Gastos</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            border: '#e2e8f0',
-            background: '#f8fafc',
-            foreground: '#0f172a',
-            card: '#ffffff',
-            muted: '#f1f5f9',
-            'muted-foreground': '#64748b',
-            primary: '#059669',
-            'primary-hover': '#047857',
-            'primary-foreground': '#ffffff',
-            danger: '#dc2626'
-          }
-        }
-      }
-    }
-  </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #0f172a; }
-
-    /* Estilos específicos para impressão do Documento Administrativo */
-    @media print {
-      body { background-color: #ffffff !important; color: #000000 !important; font-size: 11pt; }
-      header, .no-print, button, input, select { display: none !important; }
-      #relatorio-print { display: block !important; }
-      .print-border { border-color: #000000 !important; }
-    }
-    #relatorio-print { display: none; }
-  </style>
 </head>
-<body class="min-h-screen bg-background text-foreground antialiased">
-  
-  <!-- Cabeçalho Web -->
-  <header class="sticky top-0 z-40 border-b border-border bg-white/90 shadow-sm backdrop-blur no-print">
-    <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
-      <div class="flex items-center gap-3">
-        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-primary text-xl border border-emerald-200 shadow-sm">
-          🚤
+<body class="bg-slate-100 text-slate-800 font-sans p-4 md:p-8">
+
+  <div class="max-w-5xl mx-auto space-y-6">
+    
+    <!-- Cabeçalho -->
+    <header class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+      <h1 class="text-2xl font-bold text-slate-900">Calculadora de Divisão de Gastos</h1>
+      <p class="text-sm text-slate-500">Acompanhe as despesas compartilhadas entre Fausto e Leonardo</p>
+    </header>
+
+    <!-- KPIs -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 space-y-1">
+        <span class="text-xs font-medium text-slate-500">Total Geral</span>
+        <p id="kpi-total" class="text-2xl font-bold text-slate-900">R$ 0,00</p>
+        <span id="kpi-qtd" class="text-xs text-slate-400">0 itens</span>
+      </div>
+
+      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 space-y-1">
+        <span class="text-xs font-medium text-emerald-600">Pago por Fausto</span>
+        <p id="kpi-fausto" class="text-2xl font-bold text-emerald-700">R$ 0,00</p>
+        <span id="kpi-fausto-perc" class="text-xs text-slate-400">0% do total</span>
+      </div>
+
+      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 space-y-1">
+        <span class="text-xs font-medium text-blue-600">Pago por Leonardo</span>
+        <p id="kpi-leonardo" class="text-2xl font-bold text-blue-700">R$ 0,00</p>
+        <span id="kpi-leonardo-perc" class="text-xs text-slate-400">0% do total</span>
+      </div>
+
+      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 space-y-1">
+        <span class="text-xs font-medium text-purple-600">Cota Ideal (50%)</span>
+        <p id="kpi-cota" class="text-2xl font-bold text-purple-700">R$ 0,00</p>
+        <span id="kpi-ticket" class="text-xs text-slate-400">Média R$ 0,00</span>
+      </div>
+    </div>
+
+    <!-- Barra de Progresso e Balanço -->
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 space-y-4">
+      <h2 class="text-lg font-semibold text-slate-900">Distribuição dos Gastos</h2>
+      <div class="space-y-1">
+        <div class="h-4 w-full bg-blue-500 rounded-full overflow-hidden flex">
+          <div id="progresso-fausto" class="h-full bg-emerald-500 transition-all duration-300" style="width: 50%"></div>
+        </div>
+        <div class="flex justify-between text-xs font-medium pt-1">
+          <span id="label-perc-fausto" class="text-emerald-700">Fausto 50%</span>
+          <span id="label-perc-leonardo" class="text-blue-700">Leonardo 50%</span>
+        </div>
+      </div>
+      <div id="box-acerto" class="p-3 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700">
+        As contas estão 100% equilibradas.
+      </div>
+    </div>
+
+    <!-- Formulário de Cadastro -->
+    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+      <h2 class="text-lg font-semibold text-slate-900 mb-4">Adicionar Novo Gasto</h2>
+      <form id="form-gasto" onsubmit="adicionarGasto(event)" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <div>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Descrição</label>
+          <input type="text" id="input-item" required placeholder="Ex: Mercado" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
         <div>
-          <h1 class="font-bold text-lg sm:text-xl text-slate-900">Barco Compartilhado</h1>
-          <p class="text-xs text-muted-foreground">Prestação de Contas · Fausto & Leonardo</p>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Categoria</label>
+          <input type="text" id="input-categoria" required placeholder="Ex: Alimentação" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
         </div>
-      </div>
-      <div class="flex items-center gap-2">
-        <button onclick="exportarExcel()" class="rounded-lg border border-border bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 transition shadow-sm">
-          📊 Baixar Excel
-        </button>
-        <button onclick="gerarRelatorioPDF()" class="rounded-lg border border-slate-300 bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-800 hover:bg-slate-200 transition shadow-sm">
-          📄 Gerar Documento PDF
-        </button>
-        <button onclick="copiarResumo()" class="rounded-lg border border-border bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50 transition shadow-sm">
-          Copiar WhatsApp
-        </button>
-        <button onclick="tentarAdicionar()" class="rounded-lg bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground hover:bg-primary-hover transition shadow-sm">
-          + Adicionar gasto
-        </button>
-      </div>
-    </div>
-  </header>
-
-  <!-- Painel Web Principal -->
-  <main class="mx-auto max-w-7xl space-y-6 px-4 py-6 sm:px-6 no-print">
-    <!-- Indicadores -->
-    <section class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      <div class="rounded-xl border border-emerald-200 bg-white p-5 shadow-sm">
-        <p class="text-xs font-medium text-muted-foreground uppercase tracking-wider">Investimento total</p>
-        <p id="kpi-total" class="mt-2 text-2xl font-bold text-primary font-mono">R$ 0,00</p>
-        <p id="kpi-qtd" class="mt-1 text-xs text-muted-foreground">0 itens</p>
-      </div>
-      <div class="rounded-xl border border-border bg-white p-5 shadow-sm">
-        <p class="text-xs font-medium text-muted-foreground uppercase tracking-wider">Fausto pagou</p>
-        <p id="kpi-fausto" class="mt-2 text-2xl font-bold text-slate-900 font-mono">R$ 0,00</p>
-        <p id="kpi-fausto-perc" class="mt-1 text-xs text-muted-foreground">0% do total</p>
-      </div>
-      <div class="rounded-xl border border-border bg-white p-5 shadow-sm">
-        <p class="text-xs font-medium text-muted-foreground uppercase tracking-wider">Leonardo pagou</p>
-        <p id="kpi-leonardo" class="mt-2 text-2xl font-bold text-slate-900 font-mono">R$ 0,00</p>
-        <p id="kpi-leonardo-perc" class="mt-1 text-xs text-muted-foreground">0% do total</p>
-      </div>
-      <div class="rounded-xl border border-border bg-white p-5 shadow-sm">
-        <p class="text-xs font-medium text-muted-foreground uppercase tracking-wider">Cota de cada um (50%)</p>
-        <p id="kpi-cota" class="mt-2 text-2xl font-bold text-slate-900 font-mono">R$ 0,00</p>
-        <p id="kpi-ticket" class="mt-1 text-xs text-muted-foreground">Média R$ 0,00</p>
-      </div>
-    </section>
-
-    <!-- Equilíbrio e Maiores Gastos -->
-    <div class="grid gap-6 lg:grid-cols-5">
-      <div class="rounded-xl border border-border bg-white p-6 shadow-sm lg:col-span-3">
-        <h2 class="text-base font-semibold text-slate-900">Equilíbrio financeiro</h2>
-        <div class="mt-4 space-y-4">
-          <div class="h-4 w-full overflow-hidden rounded-full bg-slate-100 border border-slate-200">
-            <div id="progresso-fausto" class="h-full bg-emerald-500 transition-all duration-500" style="width: 50%"></div>
-          </div>
-          <div class="flex justify-between text-xs font-medium text-muted-foreground">
-            <span id="label-perc-fausto">Fausto 50%</span>
-            <span id="label-perc-leonardo">Leonardo 50%</span>
-          </div>
-          <div id="box-acerto" class="rounded-lg border border-emerald-100 bg-emerald-50/70 p-4 text-sm text-slate-800 leading-relaxed"></div>
-        </div>
-      </div>
-
-      <div class="rounded-xl border border-border bg-white p-6 shadow-sm lg:col-span-2">
-        <h2 class="text-base font-semibold text-slate-900">Maiores aportes</h2>
-        <div id="lista-maiores" class="mt-4 space-y-2.5"></div>
-      </div>
-    </div>
-
-    <!-- Categorias -->
-    <div class="rounded-xl border border-border bg-white p-6 shadow-sm">
-      <h2 class="text-base font-semibold text-slate-900">Gastos por categoria</h2>
-      <div id="lista-categorias" class="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3"></div>
-    </div>
-
-    <!-- Tabela Geral -->
-    <div class="rounded-xl border border-border bg-white shadow-sm overflow-hidden">
-      <div class="flex flex-wrap items-center justify-between gap-3 border-b border-border p-4 sm:p-6 bg-slate-50/50">
         <div>
-          <h2 class="text-base font-semibold text-slate-900">Todos os gastos</h2>
-          <p id="tabela-contador" class="text-xs text-muted-foreground">0 itens</p>
-        </div>
-        <div class="flex flex-wrap items-center gap-2">
-          <input id="input-busca" oninput="filtrar()" type="text" placeholder="Buscar item ou categoria..." class="rounded-lg border border-border bg-white px-3 py-1.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none sm:w-64" />
-          <select id="filtro-pessoa" onchange="filtrar()" class="rounded-lg border border-border bg-white px-3 py-1.5 text-xs text-slate-900 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none">
-            <option value="todos">Todos</option>
+          <label class="block text-xs font-medium text-slate-600 mb-1">Quem pagou?</label>
+          <select id="input-pessoa" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
             <option value="Fausto">Fausto</option>
             <option value="Leonardo">Leonardo</option>
           </select>
-          <button onclick="restaurar()" title="Restaurar originais" class="rounded-lg border border-border bg-white p-1.5 text-slate-500 hover:text-slate-900 hover:bg-slate-50 shadow-sm">
-            🔄
-          </button>
-        </div>
-      </div>
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-sm">
-          <thead class="border-b border-border bg-slate-50 text-xs font-semibold text-slate-600 uppercase tracking-wider">
-            <tr>
-              <th class="px-4 py-3.5 sm:px-6">Item</th>
-              <th class="px-4 py-3.5">Categoria</th>
-              <th class="px-4 py-3.5">Quem pagou</th>
-              <th class="px-4 py-3.5 text-right">Valor</th>
-              <th class="px-4 py-3.5 text-center w-12">Ações</th>
-            </tr>
-          </thead>
-          <tbody id="tabela-corpo" class="divide-y divide-border"></tbody>
-        </table>
-      </div>
-    </div>
-  </main>
-
-  <!-- DOCUMENTO ADMINISTRATIVO (Visível na impressão / exportação de PDF) -->
-  <div id="relatorio-print" class="p-8 max-w-4xl mx-auto font-sans">
-    <div class="border-b-2 border-slate-900 pb-4 mb-6">
-      <div class="flex justify-between items-start">
-        <div>
-          <h1 class="text-2xl font-bold uppercase tracking-wide text-slate-900">Relatório Administrativo de Prestação de Contas</h1>
-          <p class="text-sm text-slate-600 mt-1">Aquisição e Equipamento de Embarcação em Copropriedade (50% / 50%)</p>
-        </div>
-        <div class="text-right text-xs text-slate-500">
-          <p><strong>Emissão:</strong> <span id="doc-data-emissao"></span></p>
-          <p><strong>Status:</strong> Fechamento Provisório</p>
-        </div>
-      </div>
-    </div>
-
-    <!-- Resumo dos Titulares -->
-    <div class="grid grid-cols-2 gap-4 mb-6 text-sm border border-slate-300 p-4 rounded bg-slate-50">
-      <div>
-        <p class="font-bold text-slate-800 border-b border-slate-200 pb-1 mb-2">Coproprietário A</p>
-        <p><strong>Nome:</strong> Fausto Tomazini</p>
-        <p><strong>Total aportado:</strong> <span id="doc-total-fausto" class="font-mono font-bold"></span></p>
-        <p><strong>Participação real:</strong> <span id="doc-perc-fausto"></span></p>
-      </div>
-      <div>
-        <p class="font-bold text-slate-800 border-b border-slate-200 pb-1 mb-2">Coproprietário B</p>
-        <p><strong>Nome:</strong> Leonardo Mattos de Aguiar</p>
-        <p><strong>Total aportado:</strong> <span id="doc-total-leo" class="font-mono font-bold"></span></p>
-        <p><strong>Participação real:</strong> <span id="doc-perc-leo"></span></p>
-      </div>
-    </div>
-
-    <!-- Indicador de Fechamento -->
-    <div class="mb-6 p-4 border border-slate-400 rounded bg-white">
-      <div class="flex justify-between items-center text-sm mb-2">
-        <span><strong>Investimento Global Consolidado:</strong></span>
-        <span id="doc-total-geral" class="font-mono font-bold text-base"></span>
-      </div>
-      <div class="flex justify-between items-center text-sm mb-2">
-        <span><strong>Cota Igualitária por Titular (50%):</strong></span>
-        <span id="doc-cota-individual" class="font-mono font-bold"></span>
-      </div>
-      <div class="border-t border-slate-200 pt-2 text-sm text-slate-800" id="doc-status-acerto"></div>
-    </div>
-
-    <!-- Tabela Detalhada Oficial -->
-    <div class="mb-8">
-      <h2 class="text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Detalhamento dos Itens e Comprovantes</h2>
-      <table class="w-full text-left text-xs border border-slate-300 border-collapse">
-        <thead>
-          <tr class="bg-slate-200 text-slate-800 border-b border-slate-300">
-            <th class="p-2 border-r border-slate-300 w-10 text-center">Nº</th>
-            <th class="p-2 border-r border-slate-300">Descrição do Item / Serviço</th>
-            <th class="p-2 border-r border-slate-300 w-44">Categoria</th>
-            <th class="p-2 border-r border-slate-300 w-28 text-center">Titular Responsável</th>
-            <th class="p-2 text-right w-32">Valor (R$)</th>
-          </tr>
-        </thead>
-        <tbody id="doc-tabela-corpo"></tbody>
-        <tfoot>
-          <tr class="bg-slate-100 font-bold border-t-2 border-slate-400">
-            <td colspan="4" class="p-2 text-right border-r border-slate-300">TOTAL GERAL ACUMULADO:</td>
-            <td id="doc-tabela-total" class="p-2 text-right font-mono"></td>
-          </tr>
-        </tfoot>
-      </table>
-    </div>
-
-    <!-- Assinaturas -->
-    <div class="pt-12 mt-12 border-t border-slate-300 text-xs text-slate-600">
-      <div class="grid grid-cols-2 gap-12 text-center">
-        <div>
-          <div class="border-b border-slate-400 mb-2"></div>
-          <p class="font-bold text-slate-800">FAUSTO TOMAZINI</p>
-          <p>Coproprietário</p>
         </div>
         <div>
-          <div class="border-b border-slate-400 mb-2"></div>
-          <p class="font-bold text-slate-800">LEONARDO MATTOS DE AGUIAR</p>
-          <p>Coproprietário</p>
-        </div>
-      </div>
-      <p class="text-center mt-8 text-[10px] text-slate-400">Documento gerado automaticamente pelo Sistema de Gestão Financeira de Copropriedade.</p>
-    </div>
-  </div>
-
-  <!-- Modal Adicionar Gasto -->
-  <div id="modal-gasto" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4 no-print">
-    <div class="w-full max-w-md rounded-2xl border border-border bg-white p-6 shadow-2xl">
-      <h3 class="font-bold text-lg text-slate-900 border-b border-border pb-3">Novo gasto</h3>
-      <form id="form-gasto" onsubmit="salvarGasto(event)" class="mt-4 space-y-4">
-        <div>
-          <label class="block text-xs font-semibold text-slate-600 mb-1">Item / Descrição</label>
-          <input id="form-item" required type="text" placeholder="Ex.: Motor de popa 40 HP" class="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-slate-900 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none" />
-        </div>
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1">Valor (R$)</label>
-            <input id="form-valor" required placeholder="0,00" class="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-slate-900 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none" />
+          <label class="block text-xs font-medium text-slate-600 mb-1">Valor (R$)</label>
+          <div class="flex gap-2">
+            <input type="number" step="0.01" id="input-valor" required placeholder="0,00" class="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg text-sm transition">Salvar</button>
           </div>
-          <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1">Quem pagou</label>
-            <select id="form-pessoa" class="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-slate-900 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none">
-              <option value="Leonardo" selected>Leonardo</option>
-              <option value="Fausto">Fausto</option>
-            </select>
-          </div>
-        </div>
-        <div>
-          <label class="block text-xs font-semibold text-slate-600 mb-1">Categoria</label>
-          <select id="form-categoria" class="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-slate-900 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none">
-            <option value="Embarcação">Embarcação</option>
-            <option value="Motor" selected>Motor</option>
-            <option value="Reboque / Transporte">Reboque / Transporte</option>
-            <option value="Acessórios">Acessórios</option>
-            <option value="Logística">Logística</option>
-            <option value="Documentação e Taxas">Documentação e Taxas</option>
-            <option value="Personalização">Personalização</option>
-            <option value="Segurança">Segurança</option>
-            <option value="Manutenção">Manutenção</option>
-            <option value="Combustível">Combustível</option>
-            <option value="Outros">Outros</option>
-          </select>
-        </div>
-        <div class="flex justify-end gap-2 pt-3 border-t border-border">
-          <button type="button" onclick="fecharModal()" class="rounded-lg px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 transition">Cancelar</button>
-          <button type="submit" class="rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary-hover transition shadow-sm">Salvar gasto</button>
         </div>
       </form>
     </div>
+
+    <!-- Relatórios Curto -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <h3 class="text-md font-semibold text-slate-900 mb-3">Maiores Gastos</h3>
+        <div id="lista-maiores" class="space-y-1"></div>
+      </div>
+      <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+        <h3 class="text-md font-semibold text-slate-900 mb-3">Gastos por Categoria</h3>
+        <div id="lista-categorias" class="space-y-3"></div>
+      </div>
+    </div>
+
+    <!-- Tabela e Filtros -->
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <div class="p-4 sm:p-6 border-b border-slate-200 space-y-3 sm:space-y-0 sm:flex sm:items-center sm:justify-between">
+        <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          <input type="text" id="input-busca" oninput="filtrar()" placeholder="Buscar item ou categoria..." class="px-3 py-1.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <select id="filtro-pessoa" onchange="filtrar()" class="px-3 py-1.5 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="todos">Todos os Pagadores</option>
+            <option value="Fausto">Fausto</option>
+            <option value="Leonardo">Leonardo</option>
+          </select>
+        </div>
+        <span id="tabela-contador" class="text-xs text-slate-500 font-medium block"></span>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm text-slate-600">
+          <thead class="bg-slate-50 text-xs text-slate-500 uppercase border-b border-slate-200">
+            <tr>
+              <th class="px-4 py-3 sm:px-6">Item</th>
+              <th class="px-4 py-3">Categoria</th>
+              <th class="px-4 py-3">Quem Pagou</th>
+              <th class="px-4 py-3 text-right">Valor</th>
+              <th class="px-4 py-3 text-center">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tabela-corpo" class="divide-y divide-slate-200"></tbody>
+        </table>
+      </div>
+    </div>
+
   </div>
 
-  <div id="toast" class="fixed bottom-4 right-4 z-50 hidden rounded-xl border border-border bg-white px-4 py-3 text-sm font-medium text-slate-800 shadow-xl no-print"></div>
-
   <script>
-    const SENHA_MESTRE = "@Barco2026";
-    let autenticado = false;
-
-    function pedirSenha() {
-      if (autenticado) return true;
-      const tentativa = prompt("Digite a senha para autorizar a operação:");
-      if (tentativa === SENHA_MESTRE) {
-        autenticado = true;
-        showToast("Acesso autorizado!");
-        return true;
-      }
-      if (tentativa !== null) {
-        alert("Senha incorreta! Ação não autorizada.");
-      }
-      return false;
-    }
-
-    function tentarAdicionar() {
-      if (pedirSenha()) {
-        abrirModal();
-      }
-    }
-
-    const GASTOS_INICIAIS = [
-      { id: "f1", item: "Barco 6m Elite", categoria: "Embarcação", pessoa: "Fausto", valor: 12990 },
-      { id: "f2", item: "6 Bancos", categoria: "Acessórios", pessoa: "Fausto", valor: 4830 },
-      { id: "f3", item: "Capota 3,5m", categoria: "Acessórios", pessoa: "Fausto", valor: 1400 },
-      { id: "f4", item: "Frete", categoria: "Logística", pessoa: "Fausto", valor: 780 },
-      { id: "f5", item: "Plotagem Banco", categoria: "Personalização", pessoa: "Fausto", valor: 100 },
-      { id: "f6", item: "Carretinha", categoria: "Reboque / Transporte", pessoa: "Fausto", valor: 5700 },
-      { id: "f7", item: "Inclusão Reboque Novo", categoria: "Documentação e Taxas", pessoa: "Fausto", valor: 202.07 },
-      { id: "f8", item: "Autorização p/ Confecção Placa", categoria: "Documentação e Taxas", pessoa: "Fausto", valor: 36.69 },
-      { id: "f9", item: "Emplacamento", categoria: "Documentação e Taxas", pessoa: "Fausto", valor: 150 },
-      { id: "f10", item: "kit Catraca", categoria: "Reboque / Transporte", pessoa: "Fausto", valor: 125.21 }
+    let gastos = [
+      { id: '1', item: 'Supermercado', categoria: 'Alimentação', pessoa: 'Fausto', valor: 350.00 },
+      { id: '2', item: 'Conta de Luz', categoria: 'Contas', pessoa: 'Leonardo', valor: 180.50 },
+      { id: '3', item: 'Internet', categoria: 'Contas', pessoa: 'Fausto', valor: 120.00 }
     ];
 
-    const STORAGE_KEY = "gt-barco-gastos-v1";
-    let gastos = [];
-
-    function formatBRL(v) {
-      return Number(v || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+    function formatBRL(val) {
+      return val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     }
 
-    function carregar() {
-      try {
-        const s = localStorage.getItem(STORAGE_KEY);
-        gastos = s ? JSON.parse(s) : [...GASTOS_INICIAIS];
-      } catch (e) {
-        gastos = [...GASTOS_INICIAIS];
-      }
+    function adicionarGasto(e) {
+      e.preventDefault();
+      const item = document.getElementById('input-item').value;
+      const categoria = document.getElementById('input-categoria').value;
+      const pessoa = document.getElementById('input-pessoa').value;
+      const valor = parseFloat(document.getElementById('input-valor').value);
+
+      if (!item || !categoria || isNaN(valor)) return;
+
+      gastos.push({
+        id: Date.now().toString(),
+        item,
+        categoria,
+        pessoa,
+        valor
+      });
+
+      document.getElementById('form-gasto').reset();
+      render();
     }
 
-    function salvar() {
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(gastos)); } catch (e) {}
-    }
-
-    function showToast(msg) {
-      const t = document.getElementById("toast");
-      t.innerText = msg;
-      t.classList.remove("hidden");
-      setTimeout(() => t.classList.add("hidden"), 3000);
+    function removerGasto(id) {
+      gastos = gastos.filter(g => g.id !== id);
+      render();
     }
 
     function render() {
@@ -390,10 +201,10 @@
       const maiores = [...gastos].sort((a, b) => b.valor - a.valor).slice(0, 5);
       document.getElementById("lista-maiores").innerHTML = maiores.map(g => `
         <div class="flex items-center justify-between text-sm py-1.5 border-b border-slate-100">
-          <span class="truncate pr-2 text-slate-800">${g.item} <span class="text-xs text-muted-foreground">(${g.pessoa})</span></span>
+          <span class="truncate pr-2 text-slate-800">${g.item} <span class="text-xs text-slate-400">(${g.pessoa})</span></span>
           <span class="font-semibold font-mono text-slate-900">${formatBRL(g.valor)}</span>
         </div>
-      `).join("") || '<p class="text-xs text-muted-foreground">Sem gastos.</p>';
+      `).join("") || '<p class="text-xs text-slate-400">Sem gastos cadastrados.</p>';
 
       const mapCat = {};
       gastos.forEach(g => { mapCat[g.categoria] = (mapCat[g.categoria] || 0) + g.valor; });
@@ -405,13 +216,13 @@
         <div class="rounded-lg border border-slate-200 bg-slate-50/70 p-3 space-y-2">
           <div class="flex justify-between text-xs font-medium">
             <span class="truncate text-slate-800">${c.categoria}</span>
-            <span class="text-muted-foreground font-mono">${formatBRL(c.valor)} · ${c.perc.toFixed(1)}%</span>
+            <span class="text-slate-500 font-mono">${formatBRL(c.valor)} · ${c.perc.toFixed(1)}%</span>
           </div>
           <div class="h-2 w-full overflow-hidden rounded-full bg-slate-200">
             <div class="h-full bg-emerald-500" style="width: ${c.perc}%"></div>
           </div>
         </div>
-      `).join("");
+      `).join("") || '<p class="text-xs text-slate-400">Nenhuma categoria registrada.</p>';
 
       filtrar();
     }
@@ -430,237 +241,21 @@
       document.getElementById("tabela-corpo").innerHTML = lista.map(g => `
         <tr class="hover:bg-slate-50 transition">
           <td class="px-4 py-3 sm:px-6 font-medium text-slate-900">${g.item}</td>
-          <td class="px-4 py-3 text-muted-foreground text-xs">${g.categoria}</td>
+          <td class="px-4 py-3 text-slate-500 text-xs">${g.categoria}</td>
           <td class="px-4 py-3">
-            <span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${g.pessoa === 'Fausto' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-slate-100 text-slate-700 border border-slate-200'}">
+            <span class="inline-flex rounded-full px-2.5 py-0.5 text-xs font-semibold ${g.pessoa === 'Fausto' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-blue-100 text-blue-800 border border-blue-200'}">
               ${g.pessoa}
             </span>
           </td>
           <td class="px-4 py-3 text-right font-semibold font-mono text-slate-900">${formatBRL(g.valor)}</td>
           <td class="px-4 py-3 text-center">
-            <button onclick="removerGasto('${g.id}')" title="Excluir" class="text-slate-400 hover:text-danger transition">🗑️</button>
+            <button onclick="removerGasto('${g.id}')" title="Excluir" class="text-slate-400 hover:text-red-500 transition">🗑️</button>
           </td>
         </tr>
-      `).join("");
+      `).join("") || '<tr><td colspan="5" class="px-4 py-6 text-center text-slate-400 text-xs">Nenhum gasto encontrado.</td></tr>';
     }
 
-    function abrirModal() {
-      document.getElementById("modal-gasto").classList.remove("hidden");
-      document.getElementById("modal-gasto").classList.add("flex");
-      document.getElementById("form-item").focus();
-    }
-
-    function fecharModal() {
-      document.getElementById("modal-gasto").classList.add("hidden");
-      document.getElementById("modal-gasto").classList.remove("flex");
-      document.getElementById("form-gasto").reset();
-    }
-
-    function salvarGasto(e) {
-      e.preventDefault();
-      const item = document.getElementById("form-item").value.trim();
-      const rawValor = document.getElementById("form-valor").value.replace(/\s|R\$/g, "").replace(/\./g, "").replace(",", ".");
-      const valor = parseFloat(rawValor);
-      const pessoa = document.getElementById("form-pessoa").value;
-      const categoria = document.getElementById("form-categoria").value;
-
-      if (!item || isNaN(valor) || valor <= 0) return;
-
-      gastos.push({ id: "g-" + Date.now(), item, valor, categoria, pessoa });
-      salvar();
-      render();
-      fecharModal();
-      showToast(`${item} adicionado com sucesso!`);
-    }
-
-    function removerGasto(id) {
-      if (!pedirSenha()) return;
-      const g = gastos.find(i => i.id === id);
-      if (g && confirm(`Remover "${g.item}"?`)) {
-        gastos = gastos.filter(i => i.id !== id);
-        salvar();
-        render();
-        showToast("Removido.");
-      }
-    }
-
-    function restaurar() {
-      if (!pedirSenha()) return;
-      if (confirm("Restaurar lista original do Fausto?")) {
-        gastos = [...GASTOS_INICIAIS];
-        salvar();
-        render();
-        showToast("Restaurado.");
-      }
-    }
-
-    /* EXPORTAÇÃO: DOCUMENTO ADMINISTRATIVO EM PDF/IMPRESSÃO */
-    function gerarRelatorioPDF() {
-      const agora = new Date();
-      const dataFormatada = agora.toLocaleDateString("pt-BR") + " às " + agora.toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' });
-      document.getElementById("doc-data-emissao").innerText = dataFormatada;
-
-      const total = gastos.reduce((s, g) => s + g.valor, 0);
-      const fausto = gastos.filter(g => g.pessoa === "Fausto").reduce((s, g) => s + g.valor, 0);
-      const leo = gastos.filter(g => g.pessoa === "Leonardo").reduce((s, g) => s + g.valor, 0);
-      const cota = total / 2;
-      const percFausto = total > 0 ? (fausto / total) * 100 : 50;
-      const percLeo = 100 - percFausto;
-
-      document.getElementById("doc-total-fausto").innerText = formatBRL(fausto);
-      document.getElementById("doc-perc-fausto").innerText = `${percFausto.toFixed(1)}%`;
-      document.getElementById("doc-total-leo").innerText = formatBRL(leo);
-      document.getElementById("doc-perc-leo").innerText = `${percLeo.toFixed(1)}%`;
-
-      document.getElementById("doc-total-geral").innerText = formatBRL(total);
-      document.getElementById("doc-cota-individual").innerText = formatBRL(cota);
-
-      const diff = Math.abs(fausto - cota);
-      const credor = diff < 0.01 ? null : (fausto > cota ? "Fausto" : "Leonardo");
-      const devedor = credor === "Fausto" ? "Leonardo" : "Fausto";
-
-      document.getElementById("doc-status-acerto").innerHTML = credor
-        ? `<strong>Parecer de Compensação:</strong> Para equalização das participações em 50,00%, <strong>${devedor}</strong> apresenta débito compensatório de <strong>${formatBRL(diff)}</strong> perante <strong>${credor}</strong>, ou deverá assumir novos dispêndios no montante acumulado de <strong>${formatBRL(diff * 2)}</strong>.`
-        : `<strong>Parecer de Compensação:</strong> As contas encontram-se rigorosamente equalizadas (50,00% cada coproprietário).`;
-
-      const ordenados = [...gastos].sort((a, b) => b.valor - a.valor);
-      document.getElementById("doc-tabela-corpo").innerHTML = ordenados.map((g, idx) => `
-        <tr class="border-b border-slate-300 ${idx % 2 === 1 ? 'bg-slate-50' : 'bg-white'}">
-          <td class="p-2 border-r border-slate-300 text-center text-slate-500">${idx + 1}</td>
-          <td class="p-2 border-r border-slate-300 font-medium text-slate-900">${g.item}</td>
-          <td class="p-2 border-r border-slate-300 text-slate-600">${g.categoria}</td>
-          <td class="p-2 border-r border-slate-300 text-center font-semibold text-slate-800">${g.pessoa}</td>
-          <td class="p-2 text-right font-mono font-medium">${formatBRL(g.valor)}</td>
-        </tr>
-      `).join("");
-
-      document.getElementById("doc-tabela-total").innerText = formatBRL(total);
-
-      // Abre janela de impressão formatada
-      window.print();
-    }
-
-   // EXPORTAÇÃO EXCEL PROFISSIONAL (COTISTAS SEPARADOS + CONSOLIDAÇÃO)
-    function exportarExcelSeparado() {
-      let totalGeral = 0;
-      let totalFausto = 0;
-      let totalLeonardo = 0;
-
-      const itensFausto = [];
-      const itensLeonardo = [];
-
-      gastos.forEach(g => {
-        const v = Number(g.valor) || 0;
-        totalGeral += v;
-        if (g.pessoa === "Fausto") {
-          totalFausto += v;
-          itensFausto.push(g);
-        } else {
-          totalLeonardo += v;
-          itensLeonardo.push(g);
-        }
-      });
-
-      const cota = totalGeral / 2;
-      const diff = Math.abs(totalFausto - totalLeonardo) / 2;
-      let statusAcerto = "Cotas equilibradas";
-      if (totalFausto > totalLeonardo) {
-        statusAcerto = `Leonardo deve transferir ${formatBRL(diff)} para Fausto`;
-      } else if (totalLeonardo > totalFausto) {
-        statusAcerto = `Fausto deve transferir ${formatBRL(diff)} para Leonardo`;
-      }
-
-      const linhas = [];
-
-      // 1. CABEÇALHO DO DOCUMENTO
-      linhas.push("DEMONSTRATIVO ADMINISTRATIVO DE DESPESAS - BARCO COMPARTILHADO");
-      linhas.push(`Emissão:;${new Date().toLocaleDateString("pt-BR")} às ${new Date().toLocaleTimeString("pt-BR")}`);
-      linhas.push("");
-
-      // 2. QUADRO RESUMO GERAL
-      linhas.push("=== QUADRO RESUMO E FECHAMENTO GERAL (50% / 50%) ===");
-      linhas.push(`INVESTIMENTO TOTAL GERAL:;R$ ${totalGeral.toFixed(2).replace('.', ',')}`);
-      linhas.push(`COTA PARITÁRIA POR COTISTA (50%):;R$ ${cota.toFixed(2).replace('.', ',')}`);
-      linhas.push(`TOTAL PAGO POR FAUSTO:;R$ ${totalFausto.toFixed(2).replace('.', ',')}`);
-      linhas.push(`TOTAL PAGO POR LEONARDO:;R$ ${totalLeonardo.toFixed(2).replace('.', ',')}`);
-      linhas.push(`ACERTO / COMPENSAÇÃO DE CONTAS:;${statusAcerto}`);
-      linhas.push("");
-      linhas.push("");
-
-      // 3. BLOCO EXCLUSIVO: FAUSTO TOMAZINI
-      linhas.push("=== GASTOS PAGOS POR: FAUSTO TOMAZINI ===");
-      linhas.push("#;Descrição do Item;Categoria;Data;Valor Pago (R$)");
-
-      if (itensFausto.length === 0) {
-        linhas.push(";;Nenhum gasto registrado para Fausto;;");
-      } else {
-        itensFausto.forEach((g, i) => {
-          const val = (Number(g.valor) || 0).toFixed(2).replace('.', ',');
-          linhas.push(`${i + 1};"${g.item}";"${g.categoria}";${formatData(g.data)};R$ ${val}`);
-        });
-      }
-      linhas.push(`;SUBTOTAL FAUSTO;;;R$ ${totalFausto.toFixed(2).replace('.', ',')}`);
-      linhas.push("");
-      linhas.push("");
-
-      // 4. BLOCO EXCLUSIVO: LEONARDO AGUIAR
-      linhas.push("=== GASTOS PAGOS POR: LEONARDO AGUIAR ===");
-      linhas.push("#;Descrição do Item;Categoria;Data;Valor Pago (R$)");
-
-      if (itensLeonardo.length === 0) {
-        linhas.push(";;Nenhum gasto registrado para Leonardo;;");
-      } else {
-        itensLeonardo.forEach((g, i) => {
-          const val = (Number(g.valor) || 0).toFixed(2).replace('.', ',');
-          linhas.push(`${i + 1};"${g.item}";"${g.categoria}";${formatData(g.data)};R$ ${val}`);
-        });
-      }
-      linhas.push(`;SUBTOTAL LEONARDO;;;R$ ${totalLeonardo.toFixed(2).replace('.', ',')}`);
-      linhas.push("");
-      linhas.push("");
-
-      // 5. TOTALIZADOR FINAL
-      linhas.push("=== RESUMO FINAL DE CONFERÊNCIA ===");
-      linhas.push(`Soma dos Subtotais (Fausto + Leonardo):;R$ ${(totalFausto + totalLeonardo).toFixed(2).replace('.', ',')}`);
-      linhas.push(`Diferença Bruta entre Cotistas:;R$ ${Math.abs(totalFausto - totalLeonardo).toFixed(2).replace('.', ',')}`);
-
-      // GERAÇÃO DO ARQUIVO COM BOM UTF-8 PARA O EXCEL NÃO DESCONFIGURAR ACENTOS
-      const csvContent = "\uFEFF" + linhas.join("\r\n");
-      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      const dataArquivo = new Date().toISOString().slice(0, 10);
-      link.setAttribute("href", url);
-      link.setAttribute("download", `barco_gastos_cotistas_${dataArquivo}.csv`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-
-      showToast("Planilha Excel exportada com sucesso!");
-    }
-
-    function copiarResumo() {
-      const total = gastos.reduce((s, g) => s + g.valor, 0);
-      const fausto = gastos.filter(g => g.pessoa === "Fausto").reduce((s, g) => s + g.valor, 0);
-      const leo = gastos.filter(g => g.pessoa === "Leonardo").reduce((s, g) => s + g.valor, 0);
-      const cota = total / 2;
-      const diff = Math.abs(fausto - cota);
-      const credor = diff < 0.01 ? null : (fausto > cota ? "Fausto" : "Leonardo");
-      const devedor = credor === "Fausto" ? "Leonardo" : "Fausto";
-
-      const txt = [
-        "🚤 Barco Compartilhado — Fausto e Leonardo",
-        `💰 Total investido: ${formatBRL(total)}`,
-        `👤 Fausto: ${formatBRL(fausto)}`,
-        `👤 Leonardo: ${formatBRL(leo)}`,
-        `⚖️ Cota 50/50: ${formatBRL(cota)} cada`,
-        credor ? `👉 Acerto: ${devedor} deve ${formatBRL(diff)} para ${credor}` : "👉 Acerto: contas equilibradas!"
-      ].join("\n");
-
-      navigator.clipboard.writeText(txt).then(() => showToast("Copiado para o WhatsApp!"));
-    }
-
-    carregar();
+    // Inicialização
     render();
   </script>
 </body>
