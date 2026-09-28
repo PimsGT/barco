@@ -480,7 +480,7 @@
       const maiores = [...gastos].sort((a, b) => b.valor - a.valor).slice(0, 5);
       document.getElementById("lista-maiores").innerHTML = maiores.map(g => `
         <div class="flex items-center justify-between text-sm py-1.5 border-b border-slate-100">
-          <span class="truncate pr-2 text-slate-800">${g.item} <span class="text-xs text-muted-foreground">(${g.pessoa})</span></span>
+          <span class="truncate pr-2 text-slate-800">${g.item}</span>
           <span class="font-semibold font-mono text-slate-900">${formatBRL(g.valor)}</span>
         </div>
       `).join("") || '<p class="text-xs text-muted-foreground">Sem gastos.</p>';
