@@ -540,30 +540,80 @@
       window.print();
     }
 
-    /* EXPORTAÇÃO: PLANILHA EXCEL / CSV */
-    function exportarExcel() {
-      const cabecalho = ["Nº", "Item / Descricao", "Categoria", "Titular Responsavel", "Valor (R$)"];
-      const linhas = [...gastos].sort((a, b) => b.valor - a.valor).map((g, idx) => [
+/* EXPORTAÇÃO: PLANILHA EXCEL / CSV MELHORADA */
+  function exportarExcel() {
+  const totalGeral = gastos.reduce((s, g) => s + g.valor, 0);
+  const totalFausto = gastos.filter(g => g.pessoa === "Fausto").reduce((s, g) => s + g.valor, 0);
+  const totalLeonardo = gastos.filter(g => g.pessoa === "Leonardo").reduce((s, g) => s + g.valor, 0);
+  const cota50 = totalGeral / 2;
+
+  const percFausto = totalGeral > 0 ? (totalFausto / totalGeral) * 100 : 0;
+  const percLeonardo = totalGeral > 0 ? (totalLeonardo / totalGeral) * 100 : 0;
+
+  const diff = Math.abs(totalFausto - cota50);
+  const credor = diff < 0.01 ? null : (totalFausto > cota50 ? "Fausto" : "Leonardo");
+  const devedor = credor === "Fausto" ? "Leonardo" : "Fausto";
+
+  const linhas = [];
+
+  // Cabeçalho dos lançamentos
+  linhas.push(["Nº", "Item / Descrição", "Categoria", "Titular Responsável", "Valor (R$)"]);
+
+  // Bloco 1: Gastos do Fausto
+  const gastosFausto = gastos.filter(g => g.pessoa === "Fausto").sort((a, b) => b.valor - a.valor);
+  gastosFausto.forEach((g, idx) => {
+    linhas.push([
+      idx + 1,
+      `"${g.item.replace(/"/g, '""')}"`,
+      `"${g.categoria}"`,
+      `"${g.pessoa}"`,
+      g.valor.toFixed(2).replace(".", ",")
+    ]);
+  });
+  linhas.push(["", '"SUBTOTAL FAUSTO"', '""', '""', totalFausto.toFixed(2).replace(".", ",")]);
+  linhas.push(["", '"% SOBRE O TOTAL (FAUSTO)"', '""', '""', `"${percFausto.toFixed(2).replace(".", ",")}%"`]);
+  linhas.push([]); // Linha em branco para separação
+
+  // Bloco 2: Gastos do Leonardo
+  const gastosLeonardo = gastos.filter(g => g.pessoa === "Leonardo").sort((a, b) => b.valor - a.valor);
+  if (gastosLeonardo.length > 0) {
+    gastosLeonardo.forEach((g, idx) => {
+      linhas.push([
         idx + 1,
         `"${g.item.replace(/"/g, '""')}"`,
         `"${g.categoria}"`,
         `"${g.pessoa}"`,
         g.valor.toFixed(2).replace(".", ",")
       ]);
+    });
+  } else {
+    linhas.push(["-", '"Nenhum gasto registrado"', '"-"', '"Leonardo"', "0,00"]);
+  }
+  linhas.push(["", '"SUBTOTAL LEONARDO"', '""', '""', totalLeonardo.toFixed(2).replace(".", ",")]);
+  linhas.push(["", '"% SOBRE O TOTAL (LEONARDO)"', '""', '""', `"${percLeonardo.toFixed(2).replace(".", ",")}%"`]);
+  linhas.push([]); // Linha em branco para separação
 
-      const total = gastos.reduce((s, g) => s + g.valor, 0);
-      linhas.push(["", '"TOTAL GERAL"', '""', '""', total.toFixed(2).replace(".", ",")]);
+  // Bloco 3: Resumo Consolidado e Acerto
+  linhas.push(["", '"TOTAL GERAL INVESTIDO"', '""', '""', totalGeral.toFixed(2).replace(".", ",")]);
+  linhas.push(["", '"COTA IGUALITÁRIA (50% CADA)"', '""', '""', cota50.toFixed(2).replace(".", ",")]);
+  
+  if (credor) {
+    linhas.push(["", `"${devedor.toUpperCase()} DEVE PAGAR A ${credor.toUpperCase()}"`, '""', '""', diff.toFixed(2).replace(".", ",")]);
+  } else {
+    linhas.push(["", '"STATUS DO FINANCEIRO"', '""', '""', '"CONTAS 100% EQUILIBRADAS"']);
+  }
 
-      const csvContent = "\uFEFF" + [cabecalho.join(";"), ...linhas.map(l => l.join(";"))].join("\r\n");
-      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `Prestacao_Contas_Barco_${new Date().toISOString().slice(0, 10)}.csv`;
-      a.click();
-      URL.revokeObjectURL(url);
-      showToast("Planilha gerada com sucesso!");
-    }
+  // Montagem do arquivo CSV com UTF-8 BOM
+  const csvContent = "\uFEFF" + linhas.map(l => l.join(";")).join("\r\n");
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `Prestacao_Contas_Barco_${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast("Planilha detalhada gerada com sucesso!");
+}
 
     function copiarResumo() {
       const total = gastos.reduce((s, g) => s + g.valor, 0);
