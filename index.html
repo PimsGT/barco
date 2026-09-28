@@ -31,7 +31,6 @@
   <style>
     body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; color: #0f172a; }
 
-    /* Estilos específicos para impressão do Documento Administrativo */
     @media print {
       body { background-color: #ffffff !important; color: #000000 !important; font-size: 11pt; }
       header, .no-print, button, input, select { display: none !important; }
@@ -140,9 +139,6 @@
             <option value="Fausto">Fausto</option>
             <option value="Leonardo">Leonardo</option>
           </select>
-          <button onclick="restaurar()" title="Restaurar originais" class="rounded-lg border border-border bg-white p-1.5 text-slate-500 hover:text-slate-900 hover:bg-slate-50 shadow-sm">
-            🔄
-          </button>
         </div>
       </div>
       <div class="overflow-x-auto">
@@ -162,7 +158,7 @@
     </div>
   </main>
 
-  <!-- DOCUMENTO ADMINISTRATIVO (Visível na impressão / exportação de PDF) -->
+  <!-- DOCUMENTO ADMINISTRATIVO PARA IMPRESSÃO -->
   <div id="relatorio-print" class="p-8 max-w-4xl mx-auto font-sans">
     <div class="border-b-2 border-slate-900 pb-4 mb-6">
       <div class="flex justify-between items-start">
@@ -177,7 +173,6 @@
       </div>
     </div>
 
-    <!-- Resumo dos Titulares -->
     <div class="grid grid-cols-2 gap-4 mb-6 text-sm border border-slate-300 p-4 rounded bg-slate-50">
       <div>
         <p class="font-bold text-slate-800 border-b border-slate-200 pb-1 mb-2">Coproprietário A</p>
@@ -193,7 +188,6 @@
       </div>
     </div>
 
-    <!-- Indicador de Fechamento -->
     <div class="mb-6 p-4 border border-slate-400 rounded bg-white">
       <div class="flex justify-between items-center text-sm mb-2">
         <span><strong>Investimento Global Consolidado:</strong></span>
@@ -206,7 +200,6 @@
       <div class="border-t border-slate-200 pt-2 text-sm text-slate-800" id="doc-status-acerto"></div>
     </div>
 
-    <!-- Tabela Detalhada Oficial -->
     <div class="mb-8">
       <h2 class="text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Detalhamento dos Itens e Comprovantes</h2>
       <table class="w-full text-left text-xs border border-slate-300 border-collapse">
@@ -229,7 +222,6 @@
       </table>
     </div>
 
-    <!-- Assinaturas -->
     <div class="pt-12 mt-12 border-t border-slate-300 text-xs text-slate-600">
       <div class="grid grid-cols-2 gap-12 text-center">
         <div>
@@ -295,7 +287,43 @@
 
   <div id="toast" class="fixed bottom-4 right-4 z-50 hidden rounded-xl border border-border bg-white px-4 py-3 text-sm font-medium text-slate-800 shadow-xl no-print"></div>
 
-  <script>
+  <!-- FIREBASE INTEGRATION -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { 
+      getFirestore, 
+      collection, 
+      onSnapshot, 
+      addDoc, 
+      doc, 
+      deleteDoc,
+      getDocs
+    } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // Configuração oficial do seu projeto no Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDE5uepj4-JlFyZRiuEN2izHnSDSDJ5Gs",
+      authDomain: "barco-42a07.firebaseapp.com",
+      projectId: "barco-42a07",
+      storageBucket: "barco-42a07.firebasestorage.app",
+      messagingSenderId: "245826807945",
+      appId: "1:245826807945:web:187daf4e274e5fd764be58",
+      measurementId: "G-1S1MJWZKDZ"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const gastosRef = collection(db, "gastos_barco");
+
+    window.gastos = [];
+    window.tentarAdicionar = tentarAdicionar;
+    window.salvarGasto = salvarGasto;
+    window.removerGasto = removerGasto;
+    window.exportarExcel = exportarExcel;
+    window.gerarRelatorioPDF = gerarRelatorioPDF;
+    window.copiarResumo = copiarResumo;
+    window.filtrar = filtrar;
+
     const SENHA_MESTRE = "@Barco2026";
     let autenticado = false;
 
@@ -319,37 +347,83 @@
       }
     }
 
+    // Inicialização e Carga Automática dos Gastos Iniciais
     const GASTOS_INICIAIS = [
-      { id: "f1", item: "Barco 6m Elite", categoria: "Embarcação", pessoa: "Fausto", valor: 12990 },
-      { id: "f2", item: "6 Bancos", categoria: "Acessórios", pessoa: "Fausto", valor: 4830 },
-      { id: "f3", item: "Capota 3,5m", categoria: "Acessórios", pessoa: "Fausto", valor: 1400 },
-      { id: "f4", item: "Frete", categoria: "Logística", pessoa: "Fausto", valor: 780 },
-      { id: "f5", item: "Plotagem Banco", categoria: "Personalização", pessoa: "Fausto", valor: 100 },
-      { id: "f6", item: "Carretinha", categoria: "Reboque / Transporte", pessoa: "Fausto", valor: 5700 },
-      { id: "f7", item: "Inclusão Reboque Novo", categoria: "Documentação e Taxas", pessoa: "Fausto", valor: 202.07 },
-      { id: "f8", item: "Autorização p/ Confecção Placa", categoria: "Documentação e Taxas", pessoa: "Fausto", valor: 36.69 },
-      { id: "f9", item: "Emplacamento", categoria: "Documentação e Taxas", pessoa: "Fausto", valor: 150 },
-      { id: "f10", item: "kit Catraca", categoria: "Reboque / Transporte", pessoa: "Fausto", valor: 125.21 }
+      { item: "Barco 6m Elite", categoria: "Embarcação", pessoa: "Fausto", valor: 12990 },
+      { item: "6 Bancos", categoria: "Acessórios", pessoa: "Fausto", valor: 4830 },
+      { item: "Capota 3,5m", categoria: "Acessórios", pessoa: "Fausto", valor: 1400 },
+      { item: "Frete", categoria: "Logística", pessoa: "Fausto", valor: 780 },
+      { item: "Plotagem Banco", categoria: "Personalização", pessoa: "Fausto", valor: 100 },
+      { item: "Carretinha", categoria: "Reboque / Transporte", pessoa: "Fausto", valor: 5700 },
+      { item: "Inclusão Reboque Novo", categoria: "Documentação e Taxas", pessoa: "Fausto", valor: 202.07 },
+      { item: "Autorização p/ Confecção Placa", categoria: "Documentação e Taxas", pessoa: "Fausto", valor: 36.69 },
+      { item: "Emplacamento", categoria: "Documentação e Taxas", pessoa: "Fausto", valor: 150 },
+      { item: "kit Catraca", categoria: "Reboque / Transporte", pessoa: "Fausto", valor: 125.21 }
     ];
 
-    const STORAGE_KEY = "gt-barco-gastos-v1";
-    let gastos = [];
-
-    function formatBRL(v) {
-      return Number(v || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
-    }
-
-    function carregar() {
-      try {
-        const s = localStorage.getItem(STORAGE_KEY);
-        gastos = s ? JSON.parse(s) : [...GASTOS_INICIAIS];
-      } catch (e) {
-        gastos = [...GASTOS_INICIAIS];
+    async function checarEMigrarDadosIniciais() {
+      const snap = await getDocs(gastosRef);
+      if (snap.empty) {
+        showToast("Migrando histórico inicial para o banco de dados...");
+        for (const item of GASTOS_INICIAIS) {
+          await addDoc(gastosRef, { ...item, criadoEm: new Date() });
+        }
       }
     }
 
-    function salvar() {
-      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(gastos)); } catch (e) {}
+    checarEMigrarDadosIniciais();
+
+    // Listener em tempo real do Firestore
+    onSnapshot(gastosRef, (snapshot) => {
+      window.gastos = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+      render();
+    });
+
+    async function salvarGasto(e) {
+      e.preventDefault();
+      const item = document.getElementById("form-item").value.trim();
+      const rawValor = document.getElementById("form-valor").value.replace(/\s|R\$/g, "").replace(/\./g, "").replace(",", ".");
+      const valor = parseFloat(rawValor);
+      const pessoa = document.getElementById("form-pessoa").value;
+      const categoria = document.getElementById("form-categoria").value;
+
+      if (!item || isNaN(valor) || valor <= 0) return;
+
+      try {
+        await addDoc(gastosRef, {
+          item,
+          valor,
+          categoria,
+          pessoa,
+          criadoEm: new Date()
+        });
+        fecharModal();
+        showToast(`${item} salvo com sucesso!`);
+      } catch (err) {
+        console.error("Erro ao salvar:", err);
+        alert("Erro ao gravar dados no Firebase Firestore. Verifique se o banco de dados foi ativado no console.");
+      }
+    }
+
+    async function removerGasto(id) {
+      if (!pedirSenha()) return;
+      const g = window.gastos.find(i => i.id === id);
+      if (g && confirm(`Remover "${g.item}"?`)) {
+        try {
+          await deleteDoc(doc(db, "gastos_barco", id));
+          showToast("Item removido do banco.");
+        } catch (err) {
+          console.error(err);
+          alert("Erro ao excluir do banco de dados.");
+        }
+      }
+    }
+
+    function formatBRL(v) {
+      return Number(v || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
     }
 
     function showToast(msg) {
@@ -359,7 +433,20 @@
       setTimeout(() => t.classList.add("hidden"), 3000);
     }
 
+    function abrirModal() {
+      document.getElementById("modal-gasto").classList.remove("hidden");
+      document.getElementById("modal-gasto").classList.add("flex");
+      document.getElementById("form-item").focus();
+    }
+
+    function fecharModal() {
+      document.getElementById("modal-gasto").classList.add("hidden");
+      document.getElementById("modal-gasto").classList.remove("flex");
+      document.getElementById("form-gasto").reset();
+    }
+
     function render() {
+      const gastos = window.gastos;
       const total = gastos.reduce((s, g) => s + g.valor, 0);
       const fausto = gastos.filter(g => g.pessoa === "Fausto").reduce((s, g) => s + g.valor, 0);
       const leo = gastos.filter(g => g.pessoa === "Leonardo").reduce((s, g) => s + g.valor, 0);
@@ -420,7 +507,7 @@
       const termo = document.getElementById("input-busca").value.trim().toLowerCase();
       const filtroPessoa = document.getElementById("filtro-pessoa").value;
 
-      const lista = gastos
+      const lista = window.gastos
         .filter(g => filtroPessoa === "todos" || g.pessoa === filtroPessoa)
         .filter(g => !termo || `${g.item} ${g.categoria}`.toLowerCase().includes(termo))
         .sort((a, b) => b.valor - a.valor);
@@ -444,65 +531,14 @@
       `).join("");
     }
 
-    function abrirModal() {
-      document.getElementById("modal-gasto").classList.remove("hidden");
-      document.getElementById("modal-gasto").classList.add("flex");
-      document.getElementById("form-item").focus();
-    }
-
-    function fecharModal() {
-      document.getElementById("modal-gasto").classList.add("hidden");
-      document.getElementById("modal-gasto").classList.remove("flex");
-      document.getElementById("form-gasto").reset();
-    }
-
-    function salvarGasto(e) {
-      e.preventDefault();
-      const item = document.getElementById("form-item").value.trim();
-      const rawValor = document.getElementById("form-valor").value.replace(/\s|R\$/g, "").replace(/\./g, "").replace(",", ".");
-      const valor = parseFloat(rawValor);
-      const pessoa = document.getElementById("form-pessoa").value;
-      const categoria = document.getElementById("form-categoria").value;
-
-      if (!item || isNaN(valor) || valor <= 0) return;
-
-      gastos.push({ id: "g-" + Date.now(), item, valor, categoria, pessoa });
-      salvar();
-      render();
-      fecharModal();
-      showToast(`${item} adicionado com sucesso!`);
-    }
-
-    function removerGasto(id) {
-      if (!pedirSenha()) return;
-      const g = gastos.find(i => i.id === id);
-      if (g && confirm(`Remover "${g.item}"?`)) {
-        gastos = gastos.filter(i => i.id !== id);
-        salvar();
-        render();
-        showToast("Removido.");
-      }
-    }
-
-    function restaurar() {
-      if (!pedirSenha()) return;
-      if (confirm("Restaurar lista original do Fausto?")) {
-        gastos = [...GASTOS_INICIAIS];
-        salvar();
-        render();
-        showToast("Restaurado.");
-      }
-    }
-
-    /* EXPORTAÇÃO: DOCUMENTO ADMINISTRATIVO EM PDF/IMPRESSÃO */
     function gerarRelatorioPDF() {
       const agora = new Date();
       const dataFormatada = agora.toLocaleDateString("pt-BR") + " às " + agora.toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' });
       document.getElementById("doc-data-emissao").innerText = dataFormatada;
 
-      const total = gastos.reduce((s, g) => s + g.valor, 0);
-      const fausto = gastos.filter(g => g.pessoa === "Fausto").reduce((s, g) => s + g.valor, 0);
-      const leo = gastos.filter(g => g.pessoa === "Leonardo").reduce((s, g) => s + g.valor, 0);
+      const total = window.gastos.reduce((s, g) => s + g.valor, 0);
+      const fausto = window.gastos.filter(g => g.pessoa === "Fausto").reduce((s, g) => s + g.valor, 0);
+      const leo = window.gastos.filter(g => g.pessoa === "Leonardo").reduce((s, g) => s + g.valor, 0);
       const cota = total / 2;
       const percFausto = total > 0 ? (fausto / total) * 100 : 50;
       const percLeo = 100 - percFausto;
@@ -523,7 +559,7 @@
         ? `<strong>Parecer de Compensação:</strong> Para equalização das participações em 50,00%, <strong>${devedor}</strong> apresenta débito compensatório de <strong>${formatBRL(diff)}</strong> perante <strong>${credor}</strong>, ou deverá assumir novos dispêndios no montante acumulado de <strong>${formatBRL(diff * 2)}</strong>.`
         : `<strong>Parecer de Compensação:</strong> As contas encontram-se rigorosamente equalizadas (50,00% cada coproprietário).`;
 
-      const ordenados = [...gastos].sort((a, b) => b.valor - a.valor);
+      const ordenados = [...window.gastos].sort((a, b) => b.valor - a.valor);
       document.getElementById("doc-tabela-corpo").innerHTML = ordenados.map((g, idx) => `
         <tr class="border-b border-slate-300 ${idx % 2 === 1 ? 'bg-slate-50' : 'bg-white'}">
           <td class="p-2 border-r border-slate-300 text-center text-slate-500">${idx + 1}</td>
@@ -535,90 +571,68 @@
       `).join("");
 
       document.getElementById("doc-tabela-total").innerText = formatBRL(total);
-
-      // Abre janela de impressão formatada
       window.print();
     }
 
-/* EXPORTAÇÃO: PLANILHA EXCEL / CSV MELHORADA */
-  function exportarExcel() {
-  const totalGeral = gastos.reduce((s, g) => s + g.valor, 0);
-  const totalFausto = gastos.filter(g => g.pessoa === "Fausto").reduce((s, g) => s + g.valor, 0);
-  const totalLeonardo = gastos.filter(g => g.pessoa === "Leonardo").reduce((s, g) => s + g.valor, 0);
-  const cota50 = totalGeral / 2;
+    function exportarExcel() {
+      const totalGeral = window.gastos.reduce((s, g) => s + g.valor, 0);
+      const totalFausto = window.gastos.filter(g => g.pessoa === "Fausto").reduce((s, g) => s + g.valor, 0);
+      const totalLeonardo = window.gastos.filter(g => g.pessoa === "Leonardo").reduce((s, g) => s + g.valor, 0);
+      const cota50 = totalGeral / 2;
 
-  const percFausto = totalGeral > 0 ? (totalFausto / totalGeral) * 100 : 0;
-  const percLeonardo = totalGeral > 0 ? (totalLeonardo / totalGeral) * 100 : 0;
+      const percFausto = totalGeral > 0 ? (totalFausto / totalGeral) * 100 : 0;
+      const percLeonardo = totalGeral > 0 ? (totalLeonardo / totalGeral) * 100 : 0;
 
-  const diff = Math.abs(totalFausto - cota50);
-  const credor = diff < 0.01 ? null : (totalFausto > cota50 ? "Fausto" : "Leonardo");
-  const devedor = credor === "Fausto" ? "Leonardo" : "Fausto";
+      const diff = Math.abs(totalFausto - cota50);
+      const credor = diff < 0.01 ? null : (totalFausto > cota50 ? "Fausto" : "Leonardo");
+      const devedor = credor === "Fausto" ? "Leonardo" : "Fausto";
 
-  const linhas = [];
+      const linhas = [["Nº", "Item / Descrição", "Categoria", "Titular Responsável", "Valor (R$)"]];
 
-  // Cabeçalho dos lançamentos
-  linhas.push(["Nº", "Item / Descrição", "Categoria", "Titular Responsável", "Valor (R$)"]);
+      const gastosFausto = window.gastos.filter(g => g.pessoa === "Fausto").sort((a, b) => b.valor - a.valor);
+      gastosFausto.forEach((g, idx) => {
+        linhas.push([idx + 1, `"${g.item.replace(/"/g, '""')}"`, `"${g.categoria}"`, `"${g.pessoa}"`, g.valor.toFixed(2).replace(".", ",")]);
+      });
+      linhas.push(["", '"SUBTOTAL FAUSTO"', '""', '""', totalFausto.toFixed(2).replace(".", ",")]);
+      linhas.push(["", '"% SOBRE O TOTAL (FAUSTO)"', '""', '""', `"${percFausto.toFixed(2).replace(".", ",")}%"`]);
+      linhas.push([]);
 
-  // Bloco 1: Gastos do Fausto
-  const gastosFausto = gastos.filter(g => g.pessoa === "Fausto").sort((a, b) => b.valor - a.valor);
-  gastosFausto.forEach((g, idx) => {
-    linhas.push([
-      idx + 1,
-      `"${g.item.replace(/"/g, '""')}"`,
-      `"${g.categoria}"`,
-      `"${g.pessoa}"`,
-      g.valor.toFixed(2).replace(".", ",")
-    ]);
-  });
-  linhas.push(["", '"SUBTOTAL FAUSTO"', '""', '""', totalFausto.toFixed(2).replace(".", ",")]);
-  linhas.push(["", '"% SOBRE O TOTAL (FAUSTO)"', '""', '""', `"${percFausto.toFixed(2).replace(".", ",")}%"`]);
-  linhas.push([]); // Linha em branco para separação
+      const gastosLeonardo = window.gastos.filter(g => g.pessoa === "Leonardo").sort((a, b) => b.valor - a.valor);
+      if (gastosLeonardo.length > 0) {
+        gastosLeonardo.forEach((g, idx) => {
+          linhas.push([idx + 1, `"${g.item.replace(/"/g, '""')}"`, `"${g.categoria}"`, `"${g.pessoa}"`, g.valor.toFixed(2).replace(".", ",")]);
+        });
+      } else {
+        linhas.push(["-", '"Nenhum gasto registrado"', '"-"', '"Leonardo"', "0,00"]);
+      }
+      linhas.push(["", '"SUBTOTAL LEONARDO"', '""', '""', totalLeonardo.toFixed(2).replace(".", ",")]);
+      linhas.push(["", '"% SOBRE O TOTAL (LEONARDO)"', '""', '""', `"${percLeonardo.toFixed(2).replace(".", ",")}%"`]);
+      linhas.push([]);
 
-  // Bloco 2: Gastos do Leonardo
-  const gastosLeonardo = gastos.filter(g => g.pessoa === "Leonardo").sort((a, b) => b.valor - a.valor);
-  if (gastosLeonardo.length > 0) {
-    gastosLeonardo.forEach((g, idx) => {
-      linhas.push([
-        idx + 1,
-        `"${g.item.replace(/"/g, '""')}"`,
-        `"${g.categoria}"`,
-        `"${g.pessoa}"`,
-        g.valor.toFixed(2).replace(".", ",")
-      ]);
-    });
-  } else {
-    linhas.push(["-", '"Nenhum gasto registrado"', '"-"', '"Leonardo"', "0,00"]);
-  }
-  linhas.push(["", '"SUBTOTAL LEONARDO"', '""', '""', totalLeonardo.toFixed(2).replace(".", ",")]);
-  linhas.push(["", '"% SOBRE O TOTAL (LEONARDO)"', '""', '""', `"${percLeonardo.toFixed(2).replace(".", ",")}%"`]);
-  linhas.push([]); // Linha em branco para separação
+      linhas.push(["", '"TOTAL GERAL INVESTIDO"', '""', '""', totalGeral.toFixed(2).replace(".", ",")]);
+      linhas.push(["", '"COTA IGUALITÁRIA (50% CADA)"', '""', '""', cota50.toFixed(2).replace(".", ",")]);
 
-  // Bloco 3: Resumo Consolidado e Acerto
-  linhas.push(["", '"TOTAL GERAL INVESTIDO"', '""', '""', totalGeral.toFixed(2).replace(".", ",")]);
-  linhas.push(["", '"COTA IGUALITÁRIA (50% CADA)"', '""', '""', cota50.toFixed(2).replace(".", ",")]);
-  
-  if (credor) {
-    linhas.push(["", `"${devedor.toUpperCase()} DEVE PAGAR A ${credor.toUpperCase()}"`, '""', '""', diff.toFixed(2).replace(".", ",")]);
-  } else {
-    linhas.push(["", '"STATUS DO FINANCEIRO"', '""', '""', '"CONTAS 100% EQUILIBRADAS"']);
-  }
+      if (credor) {
+        linhas.push(["", `"${devedor.toUpperCase()} DEVE PAGAR A ${credor.toUpperCase()}"`, '""', '""', diff.toFixed(2).replace(".", ",")]);
+      } else {
+        linhas.push(["", '"STATUS DO FINANCEIRO"', '""', '""', '"CONTAS 100% EQUILIBRADAS"']);
+      }
 
-  // Montagem do arquivo CSV com UTF-8 BOM
-  const csvContent = "\uFEFF" + linhas.map(l => l.join(";")).join("\r\n");
-  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `Prestacao_Contas_Barco_${new Date().toISOString().slice(0, 10)}.csv`;
-  a.click();
-  URL.revokeObjectURL(url);
-  showToast("Planilha detalhada gerada com sucesso!");
-}
+      const csvContent = "\uFEFF" + linhas.map(l => l.join(";")).join("\r\n");
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `Prestacao_Contas_Barco_${new Date().toISOString().slice(0, 10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast("Planilha gerada com sucesso!");
+    }
 
     function copiarResumo() {
-      const total = gastos.reduce((s, g) => s + g.valor, 0);
-      const fausto = gastos.filter(g => g.pessoa === "Fausto").reduce((s, g) => s + g.valor, 0);
-      const leo = gastos.filter(g => g.pessoa === "Leonardo").reduce((s, g) => s + g.valor, 0);
+      const total = window.gastos.reduce((s, g) => s + g.valor, 0);
+      const fausto = window.gastos.filter(g => g.pessoa === "Fausto").reduce((s, g) => s + g.valor, 0);
+      const leo = window.gastos.filter(g => g.pessoa === "Leonardo").reduce((s, g) => s + g.valor, 0);
       const cota = total / 2;
       const diff = Math.abs(fausto - cota);
       const credor = diff < 0.01 ? null : (fausto > cota ? "Fausto" : "Leonardo");
@@ -635,9 +649,6 @@
 
       navigator.clipboard.writeText(txt).then(() => showToast("Copiado para o WhatsApp!"));
     }
-
-    carregar();
-    render();
   </script>
 </body>
 </html>
