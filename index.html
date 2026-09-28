@@ -75,118 +75,90 @@
     </div>
   </header>
 
-  <!-- CABEÇALHO EXCLUSIVO PARA IMPRESSÃO (PDF) -->
-  <div class="print-only p-8 border-b-2 border-slate-900 mb-6">
-    <div class="flex justify-between items-start">
+  <!-- DOCUMENTO ADMINISTRATIVO (Visível na impressão / exportação de PDF) -->
+  <div id="relatorio-print" class="p-8 max-w-4xl mx-auto font-sans">
+    <div class="border-b-2 border-slate-900 pb-4 mb-6">
+      <div class="flex justify-between items-start">
+        <div>
+          <h1 class="text-2xl font-bold uppercase tracking-wide text-slate-900">Relatório Administrativo de Prestação de Contas</h1>
+          <p class="text-sm text-slate-600 mt-1">Aquisição e Equipamento de Embarcação em Copropriedade (50% / 50%)</p>
+        </div>
+        <div class="text-right text-xs text-slate-500">
+          <p><strong>Emissão:</strong> <span id="doc-data-emissao"></span></p>
+          <p><strong>Status:</strong> Fechamento Provisório</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resumo dos Titulares -->
+    <div class="grid grid-cols-2 gap-4 mb-6 text-sm border border-slate-300 p-4 rounded bg-slate-50">
       <div>
-        <h1 class="text-2xl font-black tracking-tight text-slate-900 uppercase">Demonstrativo Administrativo de Despesas</h1>
-        <p class="text-sm font-semibold text-slate-600 mt-1">PROJETO: Barco 6m Elite Compartilhado (Cota Paritária 50% / 50%)</p>
-        <p class="text-xs text-slate-500">Cotistas: Fausto Tomazini & Leonardo Aguiar</p>
+        <p class="font-bold text-slate-800 border-b border-slate-200 pb-1 mb-2">Coproprietário A</p>
+        <p><strong>Nome:</strong> Fausto Tomazini</p>
+        <p><strong>Total aportado:</strong> <span id="doc-total-fausto" class="font-mono font-bold"></span></p>
+        <p><strong>Participação real:</strong> <span id="doc-perc-fausto"></span></p>
       </div>
-      <div class="text-right">
-        <p class="text-xs font-mono font-medium text-slate-500">Data de Emissão</p>
-        <p class="text-sm font-bold text-slate-800" id="print-data"></p>
+      <div>
+        <p class="font-bold text-slate-800 border-b border-slate-200 pb-1 mb-2">Coproprietário B</p>
+        <p><strong>Nome:</strong> Leonardo Mattos de Aguiar</p>
+        <p><strong>Total aportado:</strong> <span id="doc-total-leo" class="font-mono font-bold"></span></p>
+        <p><strong>Participação real:</strong> <span id="doc-perc-leo"></span></p>
       </div>
+    </div>
+
+    <!-- Indicador de Fechamento -->
+    <div class="mb-6 p-4 border border-slate-400 rounded bg-white">
+      <div class="flex justify-between items-center text-sm mb-2">
+        <span><strong>Investimento Global Consolidado:</strong></span>
+        <span id="doc-total-geral" class="font-mono font-bold text-base"></span>
+      </div>
+      <div class="flex justify-between items-center text-sm mb-2">
+        <span><strong>Cota Igualitária por Titular (50%):</strong></span>
+        <span id="doc-cota-individual" class="font-mono font-bold"></span>
+      </div>
+      <div class="border-t border-slate-200 pt-2 text-sm text-slate-800" id="doc-status-acerto"></div>
+    </div>
+
+    <!-- Tabela Detalhada Oficial -->
+    <div class="mb-8">
+      <h2 class="text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Detalhamento dos Itens e Comprovantes</h2>
+      <table class="w-full text-left text-xs border border-slate-300 border-collapse">
+        <thead>
+          <tr class="bg-slate-200 text-slate-800 border-b border-slate-300">
+            <th class="p-2 border-r border-slate-300 w-10 text-center">Nº</th>
+            <th class="p-2 border-r border-slate-300">Descrição do Item / Serviço</th>
+            <th class="p-2 border-r border-slate-300 w-44">Categoria</th>
+            <th class="p-2 border-r border-slate-300 w-28 text-center">Titular Responsável</th>
+            <th class="p-2 text-right w-32">Valor (R$)</th>
+          </tr>
+        </thead>
+        <tbody id="doc-tabela-corpo"></tbody>
+        <tfoot>
+          <tr class="bg-slate-100 font-bold border-t-2 border-slate-400">
+            <td colspan="4" class="p-2 text-right border-r border-slate-300">TOTAL GERAL ACUMULADO:</td>
+            <td id="doc-tabela-total" class="p-2 text-right font-mono"></td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <!-- Assinaturas -->
+    <div class="pt-12 mt-12 border-t border-slate-300 text-xs text-slate-600">
+      <div class="grid grid-cols-2 gap-12 text-center">
+        <div>
+          <div class="border-b border-slate-400 mb-2"></div>
+          <p class="font-bold text-slate-800">FAUSTO TOMAZINI</p>
+          <p>Coproprietário</p>
+        </div>
+        <div>
+          <div class="border-b border-slate-400 mb-2"></div>
+          <p class="font-bold text-slate-800">LEONARDO MATTOS DE AGUIAR</p>
+          <p>Coproprietário</p>
+        </div>
+      </div>
+      <p class="text-center mt-8 text-[10px] text-slate-400">Documento gerado automaticamente pelo Sistema de Gestão Financeira de Copropriedade.</p>
     </div>
   </div>
-
-  <!-- CONTEÚDO PRINCIPAL -->
-  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 flex-1 w-full space-y-6">
-
-    <!-- CARDS DE TOTALIZADORES -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      
-      <!-- Total Geral -->
-      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Investimento Total</p>
-        <p id="card-total" class="text-2xl sm:text-3xl font-black text-slate-900 mt-2">R$ 0,00</p>
-        <p id="card-itens" class="text-xs text-slate-500 mt-1">0 lançamentos registrados</p>
-      </div>
-
-      <!-- Cota por Cotista -->
-      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
-        <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Cota 50% por Cotista</p>
-        <p id="card-cota" class="text-2xl sm:text-3xl font-black text-emerald-600 mt-2">R$ 0,00</p>
-        <p class="text-xs text-slate-500 mt-1">Meta individual para igualdade</p>
-      </div>
-
-      <!-- Pago por Fausto -->
-      <div class="bg-white p-5 rounded-2xl border border-blue-200 bg-blue-50/30 shadow-sm">
-        <div class="flex justify-between items-center">
-          <p class="text-xs font-bold text-blue-800 uppercase tracking-wider">Pago por Fausto</p>
-          <span class="text-xs font-bold px-2 py-0.5 bg-blue-100 text-blue-800 rounded-full" id="pct-fausto">0%</span>
-        </div>
-        <p id="card-fausto" class="text-2xl sm:text-3xl font-black text-blue-900 mt-2">R$ 0,00</p>
-        <p id="itens-fausto" class="text-xs text-blue-700/80 mt-1">0 itens</p>
-      </div>
-
-      <!-- Pago por Leonardo -->
-      <div class="bg-white p-5 rounded-2xl border border-purple-200 bg-purple-50/30 shadow-sm">
-        <div class="flex justify-between items-center">
-          <p class="text-xs font-bold text-purple-800 uppercase tracking-wider">Pago por Leonardo</p>
-          <span class="text-xs font-bold px-2 py-0.5 bg-purple-100 text-purple-800 rounded-full" id="pct-leonardo">0%</span>
-        </div>
-        <p id="card-leonardo" class="text-2xl sm:text-3xl font-black text-purple-900 mt-2">R$ 0,00</p>
-        <p id="itens-leonardo" class="text-xs text-purple-700/80 mt-1">0 itens</p>
-      </div>
-    </div>
-
-    <!-- BANNER DE ACERTO DE CONTAS -->
-    <div id="banner-acerto" class="p-5 rounded-2xl border flex flex-col sm:flex-row items-center justify-between gap-4 transition-all">
-      <!-- Inserido dinamicamente via JS -->
-    </div>
-
-    <!-- TABELA ADMINISTRATIVA DE GASTOS -->
-    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-      <div class="p-5 border-b border-slate-200 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 no-print">
-        <div>
-          <h2 class="text-base font-bold text-slate-900">Extrato Detalhado dos Gastos</h2>
-          <p class="text-xs text-slate-500">Histórico de compras e documentações comprobatórias</p>
-        </div>
-
-        <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
-          <input type="text" id="filtro-busca" oninput="render()" placeholder="Buscar por item..." class="px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500 w-full sm:w-48" />
-          
-          <select id="filtro-pessoa" onchange="render()" class="px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
-            <option value="Todos">Todos Cotistas</option>
-            <option value="Fausto">Apenas Fausto</option>
-            <option value="Leonardo">Apenas Leonardo</option>
-          </select>
-
-          <select id="filtro-cat" onchange="render()" class="px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500">
-            <option value="Todas">Todas Categorias</option>
-            <!-- Inserido dinamicamente -->
-          </select>
-        </div>
-      </div>
-
-      <!-- TABELA -->
-      <div class="overflow-x-auto">
-        <table class="w-full text-left text-xs sm:text-sm border-collapse">
-          <thead>
-            <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 font-semibold uppercase tracking-wider text-[11px]">
-              <th class="py-3.5 px-4 w-12 text-center">#</th>
-              <th class="py-3.5 px-4">Descrição do Item</th>
-              <th class="py-3.5 px-4">Categoria</th>
-              <th class="py-3.5 px-4">Pago por</th>
-              <th class="py-3.5 px-4">Data</th>
-              <th class="py-3.5 px-4 text-right">Valor</th>
-              <th class="py-3.5 px-4 text-center w-16 no-print">Ações</th>
-            </tr>
-          </thead>
-          <tbody id="tabela-corpo" class="divide-y divide-slate-100 text-slate-700 font-medium">
-            <!-- Linhas via JS -->
-          </tbody>
-          <tfoot>
-            <tr class="bg-slate-50/80 font-bold border-t-2 border-slate-200 text-slate-900 text-xs sm:text-sm">
-              <td colspan="5" class="py-3.5 px-4 text-right uppercase tracking-wider">Subtotal Selecionado:</td>
-              <td id="tabela-subtotal" class="py-3.5 px-4 text-right text-emerald-700 font-black">R$ 0,00</td>
-              <td class="no-print"></td>
-            </tr>
-          </tfoot>
-        </table>
-      </div>
-    </div>
 
     <!-- CAMPO DE ASSINATURAS NO PDF -->
     <div class="print-only mt-16 pt-8 border-t border-slate-300">
