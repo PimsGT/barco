@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>Barco Compartilhado — Gastos de Fausto e Leonardo</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Biblioteca para conversão e download direto do PDF no celular e PC -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script>
     tailwind.config = {
       theme: {
@@ -66,7 +68,7 @@
           📊 Excel
         </button>
         <button onclick="gerarRelatorioPDF()" class="flex items-center justify-center rounded-lg border border-slate-300 bg-slate-100 px-2.5 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-200 transition shadow-sm active:scale-95">
-          📄 PDF / Imprimir
+          📄 PDF / Baixar
         </button>
         <button onclick="copiarResumo()" class="flex items-center justify-center rounded-lg border border-border bg-white px-2.5 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 transition shadow-sm active:scale-95">
           📲 Whats
@@ -175,8 +177,8 @@
     </div>
   </main>
 
-  <!-- DOCUMENTO ADMINISTRATIVO PARA IMPRESSÃO -->
-  <div id="relatorio-print" class="p-8 max-w-4xl mx-auto font-sans">
+  <!-- DOCUMENTO ADMINISTRATIVO PARA PDF / IMPRESSÃO -->
+  <div id="relatorio-print" class="p-8 max-w-4xl mx-auto font-sans bg-white">
     <div class="border-b-2 border-slate-900 pb-4 mb-6">
       <div class="flex justify-between items-start">
         <div>
@@ -502,18 +504,18 @@
     function calcularResumoFinanceiro() {
       const validos = window.gastos.filter(g => !g.estornado);
 
-      // Apenas compras de patrimônio (exclui transferências diretas para não inflar o custo do barco)
+      // Compras de bens (exclui transferências diretas)
       const comprasReais = validos.filter(g => g.categoria !== "Transferência / Acerto Direto");
       const totalBarco = comprasReais.reduce((s, g) => s + g.valor, 0);
 
-      // Transferências entre sócios
+      // Transferências diretas entre os sócios
       const transferencias = validos.filter(g => g.categoria === "Transferência / Acerto Direto");
 
-      // Aportes brutos em bens
+      // Aportes brutos
       let fausto = comprasReais.filter(g => g.pessoa === "Fausto").reduce((s, g) => s + g.valor, 0);
       let leo = comprasReais.filter(g => g.pessoa === "Leonardo").reduce((s, g) => s + g.valor, 0);
 
-      // Ajuste de liquidação direta (Quem pagou ganha crédito, quem recebeu abate do saldo)
+      // Ajuste das transferências diretas
       transferencias.forEach(t => {
         if (t.pessoa === "Leonardo") {
           leo += t.valor;
@@ -672,8 +674,28 @@
       `).join("");
 
       document.getElementById("doc-tabela-total").innerText = formatBRL(res.totalBarco);
-      
-      window.print();
+
+      showToast("Gerando arquivo PDF...");
+
+      const elemento = document.getElementById("relatorio-print");
+      elemento.style.display = "block";
+
+      const opcoes = {
+        margin: [10, 10, 10, 10],
+        filename: `Relatorio_Barco_${agora.toISOString().slice(0, 10)}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, logging: false },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      html2pdf().set(opcoes).from(elemento).save().then(() => {
+        elemento.style.display = "none";
+        showToast("PDF baixado com sucesso!");
+      }).catch(err => {
+        console.error("Erro ao gerar PDF:", err);
+        window.print();
+        elemento.style.display = "none";
+      });
     }
 
     function exportarExcel() {
@@ -710,7 +732,6 @@
         linhas.push(["", '"STATUS DO FINANCEIRO"', '""', '""', '"CONTAS 100% EQUILIBRADAS"']);
       }
 
-      // Bloco de Auditoria / Estornos
       const estornados = window.gastos.filter(g => g.estornado);
       if (estornados.length > 0) {
         linhas.push([]);
