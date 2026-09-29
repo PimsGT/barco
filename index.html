@@ -60,7 +60,7 @@
         </button>
       </div>
       
-      <!-- Botões de Ação Adaptados para Mobile -->
+      <!-- Botões de Ação -->
       <div class="grid grid-cols-3 gap-2 sm:flex sm:items-center sm:gap-2">
         <button onclick="exportarExcel()" class="flex items-center justify-center rounded-lg border border-border bg-white px-2.5 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 transition shadow-sm active:scale-95">
           📊 Excel
@@ -83,19 +83,19 @@
     <!-- Indicadores (KPIs) -->
     <section class="grid grid-cols-2 gap-2.5 sm:gap-4 lg:grid-cols-4">
       <div class="rounded-xl border border-emerald-200 bg-white p-3.5 sm:p-5 shadow-sm">
-        <p class="text-[10px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider">Investimento Total</p>
+        <p class="text-[10px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider">Investimento Barco</p>
         <p id="kpi-total" class="mt-1 sm:mt-2 text-lg sm:text-2xl font-bold text-primary font-mono truncate">R$ 0,00</p>
-        <p id="kpi-qtd" class="mt-0.5 sm:mt-1 text-[11px] sm:text-xs text-muted-foreground">0 itens válidos</p>
+        <p id="kpi-qtd" class="mt-0.5 sm:mt-1 text-[11px] sm:text-xs text-muted-foreground">0 bens acumulados</p>
       </div>
       <div class="rounded-xl border border-border bg-white p-3.5 sm:p-5 shadow-sm">
-        <p class="text-[10px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider">Fausto Pagou</p>
+        <p class="text-[10px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider">Saldo Fausto</p>
         <p id="kpi-fausto" class="mt-1 sm:mt-2 text-lg sm:text-2xl font-bold text-slate-900 font-mono truncate">R$ 0,00</p>
-        <p id="kpi-fausto-perc" class="mt-0.5 sm:mt-1 text-[11px] sm:text-xs text-muted-foreground truncate">0% do total</p>
+        <p id="kpi-fausto-perc" class="mt-0.5 sm:mt-1 text-[11px] sm:text-xs text-muted-foreground truncate">0% do investido</p>
       </div>
       <div class="rounded-xl border border-border bg-white p-3.5 sm:p-5 shadow-sm">
-        <p class="text-[10px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider">Leonardo Pagou</p>
+        <p class="text-[10px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider">Saldo Leonardo</p>
         <p id="kpi-leonardo" class="mt-1 sm:mt-2 text-lg sm:text-2xl font-bold text-slate-900 font-mono truncate">R$ 0,00</p>
-        <p id="kpi-leonardo-perc" class="mt-0.5 sm:mt-1 text-[11px] sm:text-xs text-muted-foreground truncate">0% do total</p>
+        <p id="kpi-leonardo-perc" class="mt-0.5 sm:mt-1 text-[11px] sm:text-xs text-muted-foreground truncate">0% do investido</p>
       </div>
       <div class="rounded-xl border border-border bg-white p-3.5 sm:p-5 shadow-sm">
         <p class="text-[10px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider">Cota Cada (50%)</p>
@@ -136,7 +136,7 @@
     <div class="rounded-xl border border-border bg-white shadow-sm overflow-hidden">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border p-4 sm:p-6 bg-slate-50/50">
         <div>
-          <h2 class="text-sm sm:text-base font-semibold text-slate-900">Todos os gastos</h2>
+          <h2 class="text-sm sm:text-base font-semibold text-slate-900">Todos os gastos e acertos</h2>
           <p id="tabela-contador" class="text-xs text-muted-foreground">0 itens</p>
         </div>
         <div class="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
@@ -157,7 +157,7 @@
         </div>
       </div>
 
-      <!-- Tabela com Scroll Horizontal Seguro -->
+      <!-- Tabela com Scroll Horizontal -->
       <div class="w-full overflow-x-auto min-w-full">
         <table class="w-full text-left text-xs sm:text-sm whitespace-nowrap min-w-[550px]">
           <thead class="border-b border-border bg-slate-50 font-semibold text-slate-600 uppercase tracking-wider text-[10px] sm:text-xs">
@@ -194,20 +194,20 @@
       <div>
         <p class="font-bold text-slate-800 border-b border-slate-200 pb-1 mb-2">Coproprietário A</p>
         <p><strong>Nome:</strong> Fausto Tomazini</p>
-        <p><strong>Total aportado:</strong> <span id="doc-total-fausto" class="font-mono font-bold"></span></p>
-        <p><strong>Participação real:</strong> <span id="doc-perc-fausto"></span></p>
+        <p><strong>Saldo Líquido Aportado:</strong> <span id="doc-total-fausto" class="font-mono font-bold"></span></p>
+        <p><strong>Participação Real:</strong> <span id="doc-perc-fausto"></span></p>
       </div>
       <div>
         <p class="font-bold text-slate-800 border-b border-slate-200 pb-1 mb-2">Coproprietário B</p>
         <p><strong>Nome:</strong> Leonardo Mattos de Aguiar</p>
-        <p><strong>Total aportado:</strong> <span id="doc-total-leo" class="font-mono font-bold"></span></p>
-        <p><strong>Participação real:</strong> <span id="doc-perc-leo"></span></p>
+        <p><strong>Saldo Líquido Aportado:</strong> <span id="doc-total-leo" class="font-mono font-bold"></span></p>
+        <p><strong>Participação Real:</strong> <span id="doc-perc-leo"></span></p>
       </div>
     </div>
 
     <div class="mb-6 p-4 border border-slate-400 rounded bg-white">
       <div class="flex justify-between items-center text-sm mb-2">
-        <span><strong>Investimento Global Consolidado:</strong></span>
+        <span><strong>Investimento Efetivo da Embarcação:</strong></span>
         <span id="doc-total-geral" class="font-mono font-bold text-base"></span>
       </div>
       <div class="flex justify-between items-center text-sm mb-2">
@@ -218,13 +218,13 @@
     </div>
 
     <div class="mb-8">
-      <h2 class="text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Detalhamento dos Itens Ativos</h2>
+      <h2 class="text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Detalhamento de Itens e Transferências de Acerto</h2>
       <table class="w-full text-left text-xs border border-slate-300 border-collapse">
         <thead>
           <tr class="bg-slate-200 text-slate-800 border-b border-slate-300">
             <th class="p-2 border-r border-slate-300 w-10 text-center">Nº</th>
-            <th class="p-2 border-r border-slate-300">Descrição do Item / Serviço</th>
-            <th class="p-2 border-r border-slate-300 w-44">Categoria</th>
+            <th class="p-2 border-r border-slate-300">Descrição do Item / Lançamento</th>
+            <th class="p-2 border-r border-slate-300 w-48">Categoria</th>
             <th class="p-2 border-r border-slate-300 w-28 text-center">Titular Responsável</th>
             <th class="p-2 text-right w-32">Valor (R$)</th>
           </tr>
@@ -232,7 +232,7 @@
         <tbody id="doc-tabela-corpo"></tbody>
         <tfoot>
           <tr class="bg-slate-100 font-bold border-t-2 border-slate-400">
-            <td colspan="4" class="p-2 text-right border-r border-slate-300">TOTAL GERAL ACUMULADO:</td>
+            <td colspan="4" class="p-2 text-right border-r border-slate-300">INVESTIMENTO TOTAL EM BENS DA EMBARCAÇÃO:</td>
             <td id="doc-tabela-total" class="p-2 text-right font-mono"></td>
           </tr>
         </tfoot>
@@ -256,14 +256,14 @@
     </div>
   </div>
 
-  <!-- Modal Adicionar Gasto -->
+  <!-- Modal Adicionar Gasto / Acerto -->
   <div id="modal-gasto" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 no-print">
     <div class="w-full max-w-md rounded-2xl border border-border bg-white p-5 sm:p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
-      <h3 class="font-bold text-base sm:text-lg text-slate-900 border-b border-border pb-3">Novo gasto</h3>
+      <h3 class="font-bold text-base sm:text-lg text-slate-900 border-b border-border pb-3">Novo gasto ou transferência</h3>
       <form id="form-gasto" onsubmit="salvarGasto(event)" class="mt-4 space-y-4">
         <div>
           <label class="block text-xs font-semibold text-slate-600 mb-1">Item / Descrição</label>
-          <input id="form-item" required type="text" placeholder="Ex.: Motor de popa 40 HP" class="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-slate-900 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none" />
+          <input id="form-item" required type="text" placeholder="Ex.: Motor 40 HP ou Pix para Fausto (Acerto)" class="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-slate-900 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none" />
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
@@ -271,7 +271,7 @@
             <input id="form-valor" required inputmode="decimal" placeholder="0,00" class="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-slate-900 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none" />
           </div>
           <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1">Quem pagou</label>
+            <label class="block text-xs font-semibold text-slate-600 mb-1">Quem pagou / enviou</label>
             <select id="form-pessoa" class="w-full rounded-lg border border-border bg-white px-3 py-2 text-sm text-slate-900 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none">
               <option value="Leonardo" selected>Leonardo</option>
               <option value="Fausto">Fausto</option>
@@ -291,6 +291,7 @@
             <option value="Segurança">Segurança</option>
             <option value="Manutenção">Manutenção</option>
             <option value="Combustível">Combustível</option>
+            <option value="Transferência / Acerto Direto">💸 Transferência / Acerto Direto</option>
             <option value="Outros">Outros</option>
           </select>
         </div>
@@ -350,7 +351,7 @@
 
     function pedirSenha() {
       if (autenticado) return true;
-      const tentativa = prompt("Digite a senha para autorizar operacoes administrativas:");
+      const tentativa = prompt("Digite a senha para autorizar operações administrativas:");
       if (tentativa === SENHA_MESTRE) {
         autenticado = true;
         showToast("Acesso autorizado!");
@@ -451,7 +452,6 @@
       }
     }
 
-    // Função de ESTORNO (soft delete / auditoria)
     async function estornarGasto(id) {
       if (!window.modoEstornoAtivo) {
         alert("Ative o 'Modo Estorno' com a senha antes de prosseguir.");
@@ -460,7 +460,7 @@
       const g = window.gastos.find(i => i.id === id);
       if (!g || g.estornado) return;
 
-      const motivo = prompt(`Informe o motivo do estorno do item "${g.item}":`, "Lançamento duplicado ou incorreto");
+      const motivo = prompt(`Informe o motivo do estorno do registro "${g.item}":`, "Lançamento duplicado ou incorreto");
       if (motivo !== null) {
         try {
           await updateDoc(doc(db, "gastos_barco", id), {
@@ -468,7 +468,7 @@
             motivoEstorno: motivo || "Sem motivo informado",
             dataEstorno: new Date().toISOString()
           });
-          showToast(`Gasto "${g.item}" foi ESTORNADO com sucesso.`);
+          showToast(`Registro "${g.item}" foi ESTORNADO com sucesso.`);
         } catch (err) {
           console.error(err);
           alert("Erro ao registrar estorno no banco de dados.");
@@ -499,48 +499,86 @@
       document.getElementById("form-gasto").reset();
     }
 
-    function render() {
-      // Considera apenas itens válidos (não estornados) para o financeiro
+    function calcularResumoFinanceiro() {
       const validos = window.gastos.filter(g => !g.estornado);
-      const total = validos.reduce((s, g) => s + g.valor, 0);
-      const fausto = validos.filter(g => g.pessoa === "Fausto").reduce((s, g) => s + g.valor, 0);
-      const leo = validos.filter(g => g.pessoa === "Leonardo").reduce((s, g) => s + g.valor, 0);
-      const cota = total / 2;
-      const percFausto = total > 0 ? (fausto / total) * 100 : 50;
 
-      document.getElementById("kpi-total").innerText = formatBRL(total);
-      document.getElementById("kpi-qtd").innerText = `${validos.length} itens ativos`;
-      document.getElementById("kpi-fausto").innerText = formatBRL(fausto);
-      document.getElementById("kpi-fausto-perc").innerText = `${percFausto.toFixed(1)}% do total`;
-      document.getElementById("kpi-leonardo").innerText = formatBRL(leo);
-      document.getElementById("kpi-leonardo-perc").innerText = `${(100 - percFausto).toFixed(1)}% do total`;
-      document.getElementById("kpi-cota").innerText = formatBRL(cota);
-      document.getElementById("kpi-ticket").innerText = `Média ${formatBRL(validos.length ? total / validos.length : 0)}`;
+      // Apenas compras de patrimônio (exclui transferências diretas para não inflar o custo do barco)
+      const comprasReais = validos.filter(g => g.categoria !== "Transferência / Acerto Direto");
+      const totalBarco = comprasReais.reduce((s, g) => s + g.valor, 0);
 
-      document.getElementById("progresso-fausto").style.width = `${Math.min(100, Math.max(0, percFausto))}%`;
-      document.getElementById("label-perc-fausto").innerText = `Fausto ${percFausto.toFixed(1)}%`;
-      document.getElementById("label-perc-leonardo").innerText = `Leonardo ${(100 - percFausto).toFixed(1)}%`;
+      // Transferências entre sócios
+      const transferencias = validos.filter(g => g.categoria === "Transferência / Acerto Direto");
+
+      // Aportes brutos em bens
+      let fausto = comprasReais.filter(g => g.pessoa === "Fausto").reduce((s, g) => s + g.valor, 0);
+      let leo = comprasReais.filter(g => g.pessoa === "Leonardo").reduce((s, g) => s + g.valor, 0);
+
+      // Ajuste de liquidação direta (Quem pagou ganha crédito, quem recebeu abate do saldo)
+      transferencias.forEach(t => {
+        if (t.pessoa === "Leonardo") {
+          leo += t.valor;
+          fausto -= t.valor;
+        } else if (t.pessoa === "Fausto") {
+          fausto += t.valor;
+          leo -= t.valor;
+        }
+      });
+
+      const cota = totalBarco / 2;
+      const percFausto = totalBarco > 0 ? (fausto / totalBarco) * 100 : 50;
+      const percLeo = 100 - percFausto;
 
       const diff = Math.abs(fausto - cota);
       const credor = diff < 0.01 ? null : (fausto > cota ? "Fausto" : "Leonardo");
       const devedor = credor === "Fausto" ? "Leonardo" : "Fausto";
 
-      document.getElementById("box-acerto").innerHTML = credor
-        ? `Para dividir 50/50, <strong>${devedor}</strong> precisa cobrir <strong class="text-emerald-700 font-semibold">${formatBRL(diff)}</strong> a <strong>${credor}</strong> ou realizar <strong>${formatBRL(diff * 2)}</strong> em novos gastos.`
-        : `As contas estão 100% equilibradas.`;
+      return {
+        validos,
+        comprasReais,
+        totalBarco,
+        fausto,
+        leo,
+        cota,
+        percFausto,
+        percLeo,
+        diff,
+        credor,
+        devedor
+      };
+    }
 
-      const maiores = [...validos].sort((a, b) => b.valor - a.valor).slice(0, 5);
+    function render() {
+      const res = calcularResumoFinanceiro();
+
+      document.getElementById("kpi-total").innerText = formatBRL(res.totalBarco);
+      document.getElementById("kpi-qtd").innerText = `${res.comprasReais.length} itens no patrimônio`;
+      document.getElementById("kpi-fausto").innerText = formatBRL(res.fausto);
+      document.getElementById("kpi-fausto-perc").innerText = `${res.percFausto.toFixed(1)}% do investido`;
+      document.getElementById("kpi-leonardo").innerText = formatBRL(res.leo);
+      document.getElementById("kpi-leonardo-perc").innerText = `${res.percLeo.toFixed(1)}% do investido`;
+      document.getElementById("kpi-cota").innerText = formatBRL(res.cota);
+      document.getElementById("kpi-ticket").innerText = `Média ${formatBRL(res.comprasReais.length ? res.totalBarco / res.comprasReais.length : 0)}`;
+
+      document.getElementById("progresso-fausto").style.width = `${Math.min(100, Math.max(0, res.percFausto))}%`;
+      document.getElementById("label-perc-fausto").innerText = `Fausto ${res.percFausto.toFixed(1)}%`;
+      document.getElementById("label-perc-leonardo").innerText = `Leonardo ${res.percLeo.toFixed(1)}%`;
+
+      document.getElementById("box-acerto").innerHTML = res.credor
+        ? `Para dividir 50/50, <strong>${res.devedor}</strong> precisa transferir <strong class="text-emerald-700 font-semibold">${formatBRL(res.diff)}</strong> para <strong>${res.credor}</strong> (ou realizar <strong>${formatBRL(res.diff * 2)}</strong> em novas compras para o barco).`
+        : `As contas estão 100% equilibradas!`;
+
+      const maiores = [...res.comprasReais].sort((a, b) => b.valor - a.valor).slice(0, 5);
       document.getElementById("lista-maiores").innerHTML = maiores.map(g => `
         <div class="flex items-center justify-between text-xs sm:text-sm py-1.5 border-b border-slate-100">
           <span class="truncate pr-2 text-slate-800">${g.item}</span>
           <span class="font-semibold font-mono text-slate-900 shrink-0">${formatBRL(g.valor)}</span>
         </div>
-      `).join("") || '<p class="text-xs text-muted-foreground">Sem gastos.</p>';
+      `).join("") || '<p class="text-xs text-muted-foreground">Sem compras cadastradas.</p>';
 
       const mapCat = {};
-      validos.forEach(g => { mapCat[g.categoria] = (mapCat[g.categoria] || 0) + g.valor; });
+      res.comprasReais.forEach(g => { mapCat[g.categoria] = (mapCat[g.categoria] || 0) + g.valor; });
       const cats = Object.entries(mapCat).map(([categoria, valor]) => ({
-        categoria, valor, perc: total > 0 ? (valor / total) * 100 : 0
+        categoria, valor, perc: res.totalBarco > 0 ? (valor / res.totalBarco) * 100 : 0
       })).sort((a, b) => b.valor - a.valor);
 
       document.getElementById("lista-categorias").innerHTML = cats.map(c => `
@@ -573,19 +611,21 @@
         .filter(g => !termo || `${g.item} ${g.categoria}`.toLowerCase().includes(termo))
         .sort((a, b) => b.valor - a.valor);
 
-      const totalFiltro = lista.filter(g => !g.estornado).reduce((s, g) => s + g.valor, 0);
-      document.getElementById("tabela-contador").innerText = `${lista.length} exibidos · Total Ativo ${formatBRL(totalFiltro)}`;
+      const res = calcularResumoFinanceiro();
+      document.getElementById("tabela-contador").innerText = `${lista.length} exibidos · Patrimônio Total ${formatBRL(res.totalBarco)}`;
 
       const exibeAcoes = window.modoEstornoAtivo;
       document.getElementById("coluna-acoes").classList.toggle("hidden", !exibeAcoes);
 
-      document.getElementById("tabela-corpo").innerHTML = lista.map(g => `
-        <tr class="hover:bg-slate-50 transition ${g.estornado ? 'bg-rose-50/40 text-slate-400' : ''}">
+      document.getElementById("tabela-corpo").innerHTML = lista.map(g => {
+        const isTransferencia = g.categoria === "Transferência / Acerto Direto";
+        return `
+        <tr class="hover:bg-slate-50 transition ${g.estornado ? 'bg-rose-50/40 text-slate-400' : (isTransferencia ? 'bg-amber-50/30' : '')}">
           <td class="px-3 py-2.5 sm:px-6 font-medium ${g.estornado ? 'line-through text-slate-400' : 'text-slate-900'} truncate max-w-[150px] sm:max-w-none">
             ${g.item}
             ${g.estornado ? `<span class="block text-[10px] text-rose-600 no-underline font-normal">Estornado: ${g.motivoEstorno || 'Invalidação'}</span>` : ''}
           </td>
-          <td class="px-3 py-2.5 text-xs ${g.estornado ? 'line-through' : 'text-muted-foreground'}">${g.categoria}</td>
+          <td class="px-3 py-2.5 text-xs ${g.estornado ? 'line-through' : (isTransferencia ? 'font-semibold text-amber-700' : 'text-muted-foreground')}">${g.categoria}</td>
           <td class="px-3 py-2.5">
             <span class="inline-flex rounded-full px-2 py-0.5 text-[10px] sm:text-xs font-semibold ${g.estornado ? 'bg-slate-200 text-slate-600' : (g.pessoa === 'Fausto' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-blue-100 text-blue-800 border border-blue-200')}">
               ${g.pessoa}
@@ -598,7 +638,7 @@
             </td>
           ` : ''}
         </tr>
-      `).join("");
+      `}).join("");
     }
 
     function gerarRelatorioPDF() {
@@ -606,31 +646,21 @@
       const dataFormatada = agora.toLocaleDateString("pt-BR") + " às " + agora.toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' });
       document.getElementById("doc-data-emissao").innerText = dataFormatada;
 
-      const validos = window.gastos.filter(g => !g.estornado);
-      const total = validos.reduce((s, g) => s + g.valor, 0);
-      const fausto = validos.filter(g => g.pessoa === "Fausto").reduce((s, g) => s + g.valor, 0);
-      const leo = validos.filter(g => g.pessoa === "Leonardo").reduce((s, g) => s + g.valor, 0);
-      const cota = total / 2;
-      const percFausto = total > 0 ? (fausto / total) * 100 : 50;
-      const percLeo = 100 - percFausto;
+      const res = calcularResumoFinanceiro();
 
-      document.getElementById("doc-total-fausto").innerText = formatBRL(fausto);
-      document.getElementById("doc-perc-fausto").innerText = `${percFausto.toFixed(1)}%`;
-      document.getElementById("doc-total-leo").innerText = formatBRL(leo);
-      document.getElementById("doc-perc-leo").innerText = `${percLeo.toFixed(1)}%`;
+      document.getElementById("doc-total-fausto").innerText = formatBRL(res.fausto);
+      document.getElementById("doc-perc-fausto").innerText = `${res.percFausto.toFixed(1)}%`;
+      document.getElementById("doc-total-leo").innerText = formatBRL(res.leo);
+      document.getElementById("doc-perc-leo").innerText = `${res.percLeo.toFixed(1)}%`;
 
-      document.getElementById("doc-total-geral").innerText = formatBRL(total);
-      document.getElementById("doc-cota-individual").innerText = formatBRL(cota);
+      document.getElementById("doc-total-geral").innerText = formatBRL(res.totalBarco);
+      document.getElementById("doc-cota-individual").innerText = formatBRL(res.cota);
 
-      const diff = Math.abs(fausto - cota);
-      const credor = diff < 0.01 ? null : (fausto > cota ? "Fausto" : "Leonardo");
-      const devedor = credor === "Fausto" ? "Leonardo" : "Fausto";
-
-      document.getElementById("doc-status-acerto").innerHTML = credor
-        ? `<strong>Parecer de Compensação:</strong> Para equalização das participações em 50,00%, <strong>${devedor}</strong> apresenta débito compensatório de <strong>${formatBRL(diff)}</strong> perante <strong>${credor}</strong>, ou deverá assumir novos dispêndios no montante acumulado de <strong>${formatBRL(diff * 2)}</strong>.`
+      document.getElementById("doc-status-acerto").innerHTML = res.credor
+        ? `<strong>Parecer de Compensação:</strong> Para equalização das participações em 50,00%, <strong>${res.devedor}</strong> apresenta débito compensatório de <strong>${formatBRL(res.diff)}</strong> perante <strong>${res.credor}</strong>, ou deverá assumir novos dispêndios no montante acumulado de <strong>${formatBRL(res.diff * 2)}</strong> em bens para o barco.`
         : `<strong>Parecer de Compensação:</strong> As contas encontram-se rigorosamente equalizadas (50,00% cada coproprietário).`;
 
-      const ordenados = [...validos].sort((a, b) => b.valor - a.valor);
+      const ordenados = [...res.validos].sort((a, b) => b.valor - a.valor);
       document.getElementById("doc-tabela-corpo").innerHTML = ordenados.map((g, idx) => `
         <tr class="border-b border-slate-300 ${idx % 2 === 1 ? 'bg-slate-50' : 'bg-white'}">
           <td class="p-2 border-r border-slate-300 text-center text-slate-500">${idx + 1}</td>
@@ -641,58 +671,46 @@
         </tr>
       `).join("");
 
-      document.getElementById("doc-tabela-total").innerText = formatBRL(total);
+      document.getElementById("doc-tabela-total").innerText = formatBRL(res.totalBarco);
       
-      // Chamada direta do print() para ser aceito nativamente no Safari/Chrome
       window.print();
     }
 
     function exportarExcel() {
-      const validos = window.gastos.filter(g => !g.estornado);
-      const totalGeral = validos.reduce((s, g) => s + g.valor, 0);
-      const totalFausto = validos.filter(g => g.pessoa === "Fausto").reduce((s, g) => s + g.valor, 0);
-      const totalLeonardo = validos.filter(g => g.pessoa === "Leonardo").reduce((s, g) => s + g.valor, 0);
-      const cota50 = totalGeral / 2;
-
-      const percFausto = totalGeral > 0 ? (totalFausto / totalGeral) * 100 : 0;
-      const percLeonardo = totalGeral > 0 ? (totalLeonardo / totalGeral) * 100 : 0;
-
-      const diff = Math.abs(totalFausto - cota50);
-      const credor = diff < 0.01 ? null : (totalFausto > cota50 ? "Fausto" : "Leonardo");
-      const devedor = credor === "Fausto" ? "Leonardo" : "Fausto";
+      const res = calcularResumoFinanceiro();
 
       const linhas = [["Nº", "Item / Descrição", "Categoria", "Titular Responsável", "Valor (R$)"]];
 
-      const gastosFausto = validos.filter(g => g.pessoa === "Fausto").sort((a, b) => b.valor - a.valor);
-      gastosFausto.forEach((g, idx) => {
+      const itensFausto = res.validos.filter(g => g.pessoa === "Fausto").sort((a, b) => b.valor - a.valor);
+      itensFausto.forEach((g, idx) => {
         linhas.push([idx + 1, `"${g.item.replace(/"/g, '""')}"`, `"${g.categoria}"`, `"${g.pessoa}"`, g.valor.toFixed(2).replace(".", ",")]);
       });
-      linhas.push(["", '"SUBTOTAL FAUSTO"', '""', '""', totalFausto.toFixed(2).replace(".", ",")]);
-      linhas.push(["", '"% SOBRE O TOTAL (FAUSTO)"', '""', '""', `"${percFausto.toFixed(2).replace(".", ",")}%"`]);
+      linhas.push(["", '"SALDO LÍQUIDO FAUSTO"', '""', '""', res.fausto.toFixed(2).replace(".", ",")]);
+      linhas.push(["", '"% SOBRE O INVESTIMENTO"', '""', '""', `"${res.percFausto.toFixed(2).replace(".", ",")}%"`]);
       linhas.push([]);
 
-      const gastosLeonardo = validos.filter(g => g.pessoa === "Leonardo").sort((a, b) => b.valor - a.valor);
-      if (gastosLeonardo.length > 0) {
-        gastosLeonardo.forEach((g, idx) => {
+      const itensLeonardo = res.validos.filter(g => g.pessoa === "Leonardo").sort((a, b) => b.valor - a.valor);
+      if (itensLeonardo.length > 0) {
+        itensLeonardo.forEach((g, idx) => {
           linhas.push([idx + 1, `"${g.item.replace(/"/g, '""')}"`, `"${g.categoria}"`, `"${g.pessoa}"`, g.valor.toFixed(2).replace(".", ",")]);
         });
       } else {
-        linhas.push(["-", '"Nenhum gasto registrado"', '"-"', '"Leonardo"', "0,00"]);
+        linhas.push(["-", '"Nenhum gasto ou acerto registrado"', '"-"', '"Leonardo"', "0,00"]);
       }
-      linhas.push(["", '"SUBTOTAL LEONARDO"', '""', '""', totalLeonardo.toFixed(2).replace(".", ",")]);
-      linhas.push(["", '"% SOBRE O TOTAL (LEONARDO)"', '""', '""', `"${percLeonardo.toFixed(2).replace(".", ",")}%"`]);
+      linhas.push(["", '"SALDO LÍQUIDO LEONARDO"', '""', '""', res.leo.toFixed(2).replace(".", ",")]);
+      linhas.push(["", '"% SOBRE O INVESTIMENTO"', '""', '""', `"${res.percLeo.toFixed(2).replace(".", ",")}%"`]);
       linhas.push([]);
 
-      linhas.push(["", '"TOTAL GERAL INVESTIDO"', '""', '""', totalGeral.toFixed(2).replace(".", ",")]);
-      linhas.push(["", '"COTA IGUALITÁRIA (50% CADA)"', '""', '""', cota50.toFixed(2).replace(".", ",")]);
+      linhas.push(["", '"TOTAL BENS DA EMBARCAÇÃO"', '""', '""', res.totalBarco.toFixed(2).replace(".", ",")]);
+      linhas.push(["", '"COTA IGUALITÁRIA (50% CADA)"', '""', '""', res.cota.toFixed(2).replace(".", ",")]);
 
-      if (credor) {
-        linhas.push(["", `"${devedor.toUpperCase()} DEVE PAGAR A ${credor.toUpperCase()}"`, '""', '""', diff.toFixed(2).replace(".", ",")]);
+      if (res.credor) {
+        linhas.push(["", `"${res.devedor.toUpperCase()} DEVE PAGAR A ${res.credor.toUpperCase()}"`, '""', '""', res.diff.toFixed(2).replace(".", ",")]);
       } else {
         linhas.push(["", '"STATUS DO FINANCEIRO"', '""', '""', '"CONTAS 100% EQUILIBRADAS"']);
       }
 
-      // Se houver estornos, gera uma aba/bloco com o histórico de auditoria
+      // Bloco de Auditoria / Estornos
       const estornados = window.gastos.filter(g => g.estornado);
       if (estornados.length > 0) {
         linhas.push([]);
@@ -706,7 +724,6 @@
       const csvContent = "\uFEFF" + linhas.map(l => l.join(";")).join("\r\n");
       const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
       
-      // Compatibilidade Universal de Download (Desktop + Mobile)
       const fileName = `Prestacao_Contas_Barco_${new Date().toISOString().slice(0, 10)}.csv`;
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -724,22 +741,15 @@
     }
 
     function copiarResumo() {
-      const validos = window.gastos.filter(g => !g.estornado);
-      const total = validos.reduce((s, g) => s + g.valor, 0);
-      const fausto = validos.filter(g => g.pessoa === "Fausto").reduce((s, g) => s + g.valor, 0);
-      const leo = validos.filter(g => g.pessoa === "Leonardo").reduce((s, g) => s + g.valor, 0);
-      const cota = total / 2;
-      const diff = Math.abs(fausto - cota);
-      const credor = diff < 0.01 ? null : (fausto > cota ? "Fausto" : "Leonardo");
-      const devedor = credor === "Fausto" ? "Leonardo" : "Fausto";
+      const res = calcularResumoFinanceiro();
 
       const txt = [
         "🚤 Barco Compartilhado — Fausto e Leonardo",
-        `💰 Total investido: ${formatBRL(total)}`,
-        `👤 Fausto: ${formatBRL(fausto)}`,
-        `👤 Leonardo: ${formatBRL(leo)}`,
-        `⚖️ Cota 50/50: ${formatBRL(cota)} cada`,
-        credor ? `👉 Acerto: ${devedor} deve ${formatBRL(diff)} para ${credor}` : "👉 Acerto: contas equilibradas!"
+        `💰 Total investido em bens: ${formatBRL(res.totalBarco)}`,
+        `👤 Saldo Fausto: ${formatBRL(res.fausto)}`,
+        `👤 Saldo Leonardo: ${formatBRL(res.leo)}`,
+        `⚖️ Cota 50/50: ${formatBRL(res.cota)} cada`,
+        res.credor ? `👉 Acerto: ${res.devedor} deve ${formatBRL(res.diff)} para ${res.credor}` : "👉 Acerto: contas equilibradas!"
       ].join("\n");
 
       if (navigator.clipboard && window.isSecureContext) {
