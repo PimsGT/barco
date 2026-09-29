@@ -61,15 +61,15 @@
       </div>
       
       <!-- Botões de Ação Adaptados para Mobile -->
-      <div class="grid grid-cols-2 gap-2 sm:flex sm:items-center sm:gap-2">
+      <div class="grid grid-cols-3 gap-2 sm:flex sm:items-center sm:gap-2">
         <button onclick="exportarExcel()" class="flex items-center justify-center rounded-lg border border-border bg-white px-2.5 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 transition shadow-sm active:scale-95">
           📊 Excel
         </button>
         <button onclick="gerarRelatorioPDF()" class="flex items-center justify-center rounded-lg border border-slate-300 bg-slate-100 px-2.5 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-200 transition shadow-sm active:scale-95">
-          📄 Relatório PDF
+          📄 PDF / Imprimir
         </button>
         <button onclick="copiarResumo()" class="flex items-center justify-center rounded-lg border border-border bg-white px-2.5 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 transition shadow-sm active:scale-95">
-          📲 Copiar Whats
+          📲 Whats
         </button>
         <button onclick="tentarAdicionar()" class="hidden sm:flex items-center justify-center rounded-lg bg-primary px-3 py-2 text-xs font-semibold text-primary-foreground hover:bg-primary-hover transition shadow-sm active:scale-95">
           + Adicionar gasto
@@ -85,7 +85,7 @@
       <div class="rounded-xl border border-emerald-200 bg-white p-3.5 sm:p-5 shadow-sm">
         <p class="text-[10px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider">Investimento Total</p>
         <p id="kpi-total" class="mt-1 sm:mt-2 text-lg sm:text-2xl font-bold text-primary font-mono truncate">R$ 0,00</p>
-        <p id="kpi-qtd" class="mt-0.5 sm:mt-1 text-[11px] sm:text-xs text-muted-foreground">0 itens</p>
+        <p id="kpi-qtd" class="mt-0.5 sm:mt-1 text-[11px] sm:text-xs text-muted-foreground">0 itens válidos</p>
       </div>
       <div class="rounded-xl border border-border bg-white p-3.5 sm:p-5 shadow-sm">
         <p class="text-[10px] sm:text-xs font-semibold text-muted-foreground uppercase tracking-wider">Fausto Pagou</p>
@@ -139,26 +139,34 @@
           <h2 class="text-sm sm:text-base font-semibold text-slate-900">Todos os gastos</h2>
           <p id="tabela-contador" class="text-xs text-muted-foreground">0 itens</p>
         </div>
-        <div class="flex flex-col sm:flex-row gap-2">
-          <input id="input-busca" oninput="filtrar()" type="text" placeholder="Buscar item ou categoria..." class="w-full sm:w-64 rounded-lg border border-border bg-white px-3 py-2 text-xs text-slate-900 placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none" />
-          <select id="filtro-pessoa" onchange="filtrar()" class="w-full sm:w-auto rounded-lg border border-border bg-white px-3 py-2 text-xs text-slate-900 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none">
-            <option value="todos">Todos os pagadores</option>
+        <div class="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center">
+          <button id="btn-modo-estorno" onclick="toggleModoEstorno()" class="rounded-lg border border-amber-300 bg-amber-50 px-3 py-1.5 text-xs font-semibold text-amber-800 hover:bg-amber-100 transition shadow-sm flex items-center justify-center gap-1">
+            🔒 Modo Estorno
+          </button>
+          <input id="input-busca" oninput="filtrar()" type="text" placeholder="Buscar item ou categoria..." class="w-full sm:w-52 rounded-lg border border-border bg-white px-3 py-1.5 text-xs text-slate-900 placeholder:text-slate-400 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none" />
+          <select id="filtro-pessoa" onchange="filtrar()" class="w-full sm:w-auto rounded-lg border border-border bg-white px-3 py-1.5 text-xs text-slate-900 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none">
+            <option value="todos">Todos pagadores</option>
             <option value="Fausto">Fausto</option>
             <option value="Leonardo">Leonardo</option>
+          </select>
+          <select id="filtro-status" onchange="filtrar()" class="w-full sm:w-auto rounded-lg border border-border bg-white px-3 py-1.5 text-xs text-slate-900 focus:border-primary focus:ring-1 focus:ring-primary focus:outline-none">
+            <option value="validos">Apenas ativos</option>
+            <option value="todos">Ativos e Estornados</option>
+            <option value="estornados">Apenas estornados</option>
           </select>
         </div>
       </div>
 
-      <!-- Tabela com Scroll Horizontal Seguro em Telas Pequenas -->
+      <!-- Tabela com Scroll Horizontal Seguro -->
       <div class="w-full overflow-x-auto min-w-full">
-        <table class="w-full text-left text-xs sm:text-sm whitespace-nowrap min-w-[500px]">
+        <table class="w-full text-left text-xs sm:text-sm whitespace-nowrap min-w-[550px]">
           <thead class="border-b border-border bg-slate-50 font-semibold text-slate-600 uppercase tracking-wider text-[10px] sm:text-xs">
             <tr>
               <th class="px-3 py-3 sm:px-6">Item</th>
               <th class="px-3 py-3">Categoria</th>
               <th class="px-3 py-3">Quem pagou</th>
               <th class="px-3 py-3 text-right">Valor</th>
-              <th class="px-3 py-3 text-center w-10">Ações</th>
+              <th id="coluna-acoes" class="px-3 py-3 text-center w-16 hidden">Ação</th>
             </tr>
           </thead>
           <tbody id="tabela-corpo" class="divide-y divide-border"></tbody>
@@ -210,7 +218,7 @@
     </div>
 
     <div class="mb-8">
-      <h2 class="text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Detalhamento dos Itens e Comprovantes</h2>
+      <h2 class="text-xs font-bold uppercase tracking-wider text-slate-700 mb-2">Detalhamento dos Itens Ativos</h2>
       <table class="w-full text-left text-xs border border-slate-300 border-collapse">
         <thead>
           <tr class="bg-slate-200 text-slate-800 border-b border-slate-300">
@@ -248,7 +256,7 @@
     </div>
   </div>
 
-  <!-- Modal Adicionar Gasto Ajustado para Telas Pequenas -->
+  <!-- Modal Adicionar Gasto -->
   <div id="modal-gasto" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4 no-print">
     <div class="w-full max-w-md rounded-2xl border border-border bg-white p-5 sm:p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
       <h3 class="font-bold text-base sm:text-lg text-slate-900 border-b border-border pb-3">Novo gasto</h3>
@@ -305,7 +313,7 @@
       onSnapshot, 
       addDoc, 
       doc, 
-      deleteDoc,
+      updateDoc,
       getDocs
     } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
@@ -324,9 +332,12 @@
     const gastosRef = collection(db, "gastos_barco");
 
     window.gastos = [];
+    window.modoEstornoAtivo = false;
+
     window.tentarAdicionar = tentarAdicionar;
     window.salvarGasto = salvarGasto;
-    window.removerGasto = removerGasto;
+    window.estornarGasto = estornarGasto;
+    window.toggleModoEstorno = toggleModoEstorno;
     window.exportarExcel = exportarExcel;
     window.gerarRelatorioPDF = gerarRelatorioPDF;
     window.copiarResumo = copiarResumo;
@@ -339,7 +350,7 @@
 
     function pedirSenha() {
       if (autenticado) return true;
-      const tentativa = prompt("Digite a senha para autorizar:");
+      const tentativa = prompt("Digite a senha para autorizar operacoes administrativas:");
       if (tentativa === SENHA_MESTRE) {
         autenticado = true;
         showToast("Acesso autorizado!");
@@ -349,6 +360,25 @@
         alert("Senha incorreta!");
       }
       return false;
+    }
+
+    function toggleModoEstorno() {
+      if (!window.modoEstornoAtivo) {
+        if (pedirSenha()) {
+          window.modoEstornoAtivo = true;
+          document.getElementById("btn-modo-estorno").classList.replace("bg-amber-50", "bg-amber-500");
+          document.getElementById("btn-modo-estorno").classList.replace("text-amber-800", "text-white");
+          document.getElementById("btn-modo-estorno").innerText = "🔓 Sair Modo Estorno";
+          showToast("Modo de estorno HABILITADO.");
+        }
+      } else {
+        window.modoEstornoAtivo = false;
+        document.getElementById("btn-modo-estorno").classList.replace("bg-amber-500", "bg-amber-50");
+        document.getElementById("btn-modo-estorno").classList.replace("text-white", "text-amber-800");
+        document.getElementById("btn-modo-estorno").innerText = "🔒 Modo Estorno";
+        showToast("Modo de estorno DESABILITADO.");
+      }
+      render();
     }
 
     function tentarAdicionar() {
@@ -376,7 +406,7 @@
         if (snap.empty) {
           showToast("Migrando histórico inicial...");
           for (const item of GASTOS_INICIAIS) {
-            await addDoc(gastosRef, { ...item, criadoEm: new Date() });
+            await addDoc(gastosRef, { ...item, estornado: false, criadoEm: new Date() });
           }
         }
       } catch (err) {
@@ -410,6 +440,7 @@
           valor,
           categoria,
           pessoa,
+          estornado: false,
           criadoEm: new Date()
         });
         fecharModal();
@@ -420,16 +451,27 @@
       }
     }
 
-    async function removerGasto(id) {
-      if (!pedirSenha()) return;
+    // Função de ESTORNO (soft delete / auditoria)
+    async function estornarGasto(id) {
+      if (!window.modoEstornoAtivo) {
+        alert("Ative o 'Modo Estorno' com a senha antes de prosseguir.");
+        return;
+      }
       const g = window.gastos.find(i => i.id === id);
-      if (g && confirm(`Remover "${g.item}"?`)) {
+      if (!g || g.estornado) return;
+
+      const motivo = prompt(`Informe o motivo do estorno do item "${g.item}":`, "Lançamento duplicado ou incorreto");
+      if (motivo !== null) {
         try {
-          await deleteDoc(doc(db, "gastos_barco", id));
-          showToast("Item removido.");
+          await updateDoc(doc(db, "gastos_barco", id), {
+            estornado: true,
+            motivoEstorno: motivo || "Sem motivo informado",
+            dataEstorno: new Date().toISOString()
+          });
+          showToast(`Gasto "${g.item}" foi ESTORNADO com sucesso.`);
         } catch (err) {
           console.error(err);
-          alert("Erro ao excluir do banco de dados.");
+          alert("Erro ao registrar estorno no banco de dados.");
         }
       }
     }
@@ -458,21 +500,22 @@
     }
 
     function render() {
-      const gastos = window.gastos;
-      const total = gastos.reduce((s, g) => s + g.valor, 0);
-      const fausto = gastos.filter(g => g.pessoa === "Fausto").reduce((s, g) => s + g.valor, 0);
-      const leo = gastos.filter(g => g.pessoa === "Leonardo").reduce((s, g) => s + g.valor, 0);
+      // Considera apenas itens válidos (não estornados) para o financeiro
+      const validos = window.gastos.filter(g => !g.estornado);
+      const total = validos.reduce((s, g) => s + g.valor, 0);
+      const fausto = validos.filter(g => g.pessoa === "Fausto").reduce((s, g) => s + g.valor, 0);
+      const leo = validos.filter(g => g.pessoa === "Leonardo").reduce((s, g) => s + g.valor, 0);
       const cota = total / 2;
       const percFausto = total > 0 ? (fausto / total) * 100 : 50;
 
       document.getElementById("kpi-total").innerText = formatBRL(total);
-      document.getElementById("kpi-qtd").innerText = `${gastos.length} itens`;
+      document.getElementById("kpi-qtd").innerText = `${validos.length} itens ativos`;
       document.getElementById("kpi-fausto").innerText = formatBRL(fausto);
       document.getElementById("kpi-fausto-perc").innerText = `${percFausto.toFixed(1)}% do total`;
       document.getElementById("kpi-leonardo").innerText = formatBRL(leo);
       document.getElementById("kpi-leonardo-perc").innerText = `${(100 - percFausto).toFixed(1)}% do total`;
       document.getElementById("kpi-cota").innerText = formatBRL(cota);
-      document.getElementById("kpi-ticket").innerText = `Média ${formatBRL(gastos.length ? total / gastos.length : 0)}`;
+      document.getElementById("kpi-ticket").innerText = `Média ${formatBRL(validos.length ? total / validos.length : 0)}`;
 
       document.getElementById("progresso-fausto").style.width = `${Math.min(100, Math.max(0, percFausto))}%`;
       document.getElementById("label-perc-fausto").innerText = `Fausto ${percFausto.toFixed(1)}%`;
@@ -486,7 +529,7 @@
         ? `Para dividir 50/50, <strong>${devedor}</strong> precisa cobrir <strong class="text-emerald-700 font-semibold">${formatBRL(diff)}</strong> a <strong>${credor}</strong> ou realizar <strong>${formatBRL(diff * 2)}</strong> em novos gastos.`
         : `As contas estão 100% equilibradas.`;
 
-      const maiores = [...gastos].sort((a, b) => b.valor - a.valor).slice(0, 5);
+      const maiores = [...validos].sort((a, b) => b.valor - a.valor).slice(0, 5);
       document.getElementById("lista-maiores").innerHTML = maiores.map(g => `
         <div class="flex items-center justify-between text-xs sm:text-sm py-1.5 border-b border-slate-100">
           <span class="truncate pr-2 text-slate-800">${g.item}</span>
@@ -495,7 +538,7 @@
       `).join("") || '<p class="text-xs text-muted-foreground">Sem gastos.</p>';
 
       const mapCat = {};
-      gastos.forEach(g => { mapCat[g.categoria] = (mapCat[g.categoria] || 0) + g.valor; });
+      validos.forEach(g => { mapCat[g.categoria] = (mapCat[g.categoria] || 0) + g.valor; });
       const cats = Object.entries(mapCat).map(([categoria, valor]) => ({
         categoria, valor, perc: total > 0 ? (valor / total) * 100 : 0
       })).sort((a, b) => b.valor - a.valor);
@@ -518,27 +561,42 @@
     function filtrar() {
       const termo = document.getElementById("input-busca").value.trim().toLowerCase();
       const filtroPessoa = document.getElementById("filtro-pessoa").value;
+      const filtroStatus = document.getElementById("filtro-status").value;
 
       const lista = window.gastos
+        .filter(g => {
+          if (filtroStatus === "validos") return !g.estornado;
+          if (filtroStatus === "estornados") return g.estornado;
+          return true;
+        })
         .filter(g => filtroPessoa === "todos" || g.pessoa === filtroPessoa)
         .filter(g => !termo || `${g.item} ${g.categoria}`.toLowerCase().includes(termo))
         .sort((a, b) => b.valor - a.valor);
 
-      document.getElementById("tabela-contador").innerText = `${lista.length} itens listados · Total ${formatBRL(lista.reduce((s, g) => s + g.valor, 0))}`;
+      const totalFiltro = lista.filter(g => !g.estornado).reduce((s, g) => s + g.valor, 0);
+      document.getElementById("tabela-contador").innerText = `${lista.length} exibidos · Total Ativo ${formatBRL(totalFiltro)}`;
+
+      const exibeAcoes = window.modoEstornoAtivo;
+      document.getElementById("coluna-acoes").classList.toggle("hidden", !exibeAcoes);
 
       document.getElementById("tabela-corpo").innerHTML = lista.map(g => `
-        <tr class="hover:bg-slate-50 transition">
-          <td class="px-3 py-2.5 sm:px-6 font-medium text-slate-900 truncate max-w-[150px] sm:max-w-none">${g.item}</td>
-          <td class="px-3 py-2.5 text-muted-foreground text-xs">${g.categoria}</td>
+        <tr class="hover:bg-slate-50 transition ${g.estornado ? 'bg-rose-50/40 text-slate-400' : ''}">
+          <td class="px-3 py-2.5 sm:px-6 font-medium ${g.estornado ? 'line-through text-slate-400' : 'text-slate-900'} truncate max-w-[150px] sm:max-w-none">
+            ${g.item}
+            ${g.estornado ? `<span class="block text-[10px] text-rose-600 no-underline font-normal">Estornado: ${g.motivoEstorno || 'Invalidação'}</span>` : ''}
+          </td>
+          <td class="px-3 py-2.5 text-xs ${g.estornado ? 'line-through' : 'text-muted-foreground'}">${g.categoria}</td>
           <td class="px-3 py-2.5">
-            <span class="inline-flex rounded-full px-2 py-0.5 text-[10px] sm:text-xs font-semibold ${g.pessoa === 'Fausto' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-blue-100 text-blue-800 border border-blue-200'}">
+            <span class="inline-flex rounded-full px-2 py-0.5 text-[10px] sm:text-xs font-semibold ${g.estornado ? 'bg-slate-200 text-slate-600' : (g.pessoa === 'Fausto' ? 'bg-emerald-100 text-emerald-800 border border-emerald-200' : 'bg-blue-100 text-blue-800 border border-blue-200')}">
               ${g.pessoa}
             </span>
           </td>
-          <td class="px-3 py-2.5 text-right font-semibold font-mono text-slate-900">${formatBRL(g.valor)}</td>
-          <td class="px-3 py-2.5 text-center">
-            <button onclick="removerGasto('${g.id}')" title="Excluir" class="text-slate-400 hover:text-danger transition p-1">🗑️</button>
-          </td>
+          <td class="px-3 py-2.5 text-right font-semibold font-mono ${g.estornado ? 'line-through text-slate-400' : 'text-slate-900'}">${formatBRL(g.valor)}</td>
+          ${exibeAcoes ? `
+            <td class="px-3 py-2.5 text-center">
+              ${!g.estornado ? `<button onclick="estornarGasto('${g.id}')" title="Estornar registro" class="bg-rose-100 text-rose-700 hover:bg-rose-200 px-2 py-1 rounded text-xs font-semibold transition">Estornar</button>` : '<span class="text-[10px] text-slate-400">Estornado</span>'}
+            </td>
+          ` : ''}
         </tr>
       `).join("");
     }
@@ -548,9 +606,10 @@
       const dataFormatada = agora.toLocaleDateString("pt-BR") + " às " + agora.toLocaleTimeString("pt-BR", { hour: '2-digit', minute: '2-digit' });
       document.getElementById("doc-data-emissao").innerText = dataFormatada;
 
-      const total = window.gastos.reduce((s, g) => s + g.valor, 0);
-      const fausto = window.gastos.filter(g => g.pessoa === "Fausto").reduce((s, g) => s + g.valor, 0);
-      const leo = window.gastos.filter(g => g.pessoa === "Leonardo").reduce((s, g) => s + g.valor, 0);
+      const validos = window.gastos.filter(g => !g.estornado);
+      const total = validos.reduce((s, g) => s + g.valor, 0);
+      const fausto = validos.filter(g => g.pessoa === "Fausto").reduce((s, g) => s + g.valor, 0);
+      const leo = validos.filter(g => g.pessoa === "Leonardo").reduce((s, g) => s + g.valor, 0);
       const cota = total / 2;
       const percFausto = total > 0 ? (fausto / total) * 100 : 50;
       const percLeo = 100 - percFausto;
@@ -571,7 +630,7 @@
         ? `<strong>Parecer de Compensação:</strong> Para equalização das participações em 50,00%, <strong>${devedor}</strong> apresenta débito compensatório de <strong>${formatBRL(diff)}</strong> perante <strong>${credor}</strong>, ou deverá assumir novos dispêndios no montante acumulado de <strong>${formatBRL(diff * 2)}</strong>.`
         : `<strong>Parecer de Compensação:</strong> As contas encontram-se rigorosamente equalizadas (50,00% cada coproprietário).`;
 
-      const ordenados = [...window.gastos].sort((a, b) => b.valor - a.valor);
+      const ordenados = [...validos].sort((a, b) => b.valor - a.valor);
       document.getElementById("doc-tabela-corpo").innerHTML = ordenados.map((g, idx) => `
         <tr class="border-b border-slate-300 ${idx % 2 === 1 ? 'bg-slate-50' : 'bg-white'}">
           <td class="p-2 border-r border-slate-300 text-center text-slate-500">${idx + 1}</td>
@@ -584,16 +643,15 @@
 
       document.getElementById("doc-tabela-total").innerText = formatBRL(total);
       
-      // Janela/Trigger compatível com iOS/Android
-      setTimeout(() => {
-        window.print();
-      }, 200);
+      // Chamada direta do print() para ser aceito nativamente no Safari/Chrome
+      window.print();
     }
 
     function exportarExcel() {
-      const totalGeral = window.gastos.reduce((s, g) => s + g.valor, 0);
-      const totalFausto = window.gastos.filter(g => g.pessoa === "Fausto").reduce((s, g) => s + g.valor, 0);
-      const totalLeonardo = window.gastos.filter(g => g.pessoa === "Leonardo").reduce((s, g) => s + g.valor, 0);
+      const validos = window.gastos.filter(g => !g.estornado);
+      const totalGeral = validos.reduce((s, g) => s + g.valor, 0);
+      const totalFausto = validos.filter(g => g.pessoa === "Fausto").reduce((s, g) => s + g.valor, 0);
+      const totalLeonardo = validos.filter(g => g.pessoa === "Leonardo").reduce((s, g) => s + g.valor, 0);
       const cota50 = totalGeral / 2;
 
       const percFausto = totalGeral > 0 ? (totalFausto / totalGeral) * 100 : 0;
@@ -605,7 +663,7 @@
 
       const linhas = [["Nº", "Item / Descrição", "Categoria", "Titular Responsável", "Valor (R$)"]];
 
-      const gastosFausto = window.gastos.filter(g => g.pessoa === "Fausto").sort((a, b) => b.valor - a.valor);
+      const gastosFausto = validos.filter(g => g.pessoa === "Fausto").sort((a, b) => b.valor - a.valor);
       gastosFausto.forEach((g, idx) => {
         linhas.push([idx + 1, `"${g.item.replace(/"/g, '""')}"`, `"${g.categoria}"`, `"${g.pessoa}"`, g.valor.toFixed(2).replace(".", ",")]);
       });
@@ -613,7 +671,7 @@
       linhas.push(["", '"% SOBRE O TOTAL (FAUSTO)"', '""', '""', `"${percFausto.toFixed(2).replace(".", ",")}%"`]);
       linhas.push([]);
 
-      const gastosLeonardo = window.gastos.filter(g => g.pessoa === "Leonardo").sort((a, b) => b.valor - a.valor);
+      const gastosLeonardo = validos.filter(g => g.pessoa === "Leonardo").sort((a, b) => b.valor - a.valor);
       if (gastosLeonardo.length > 0) {
         gastosLeonardo.forEach((g, idx) => {
           linhas.push([idx + 1, `"${g.item.replace(/"/g, '""')}"`, `"${g.categoria}"`, `"${g.pessoa}"`, g.valor.toFixed(2).replace(".", ",")]);
@@ -634,26 +692,42 @@
         linhas.push(["", '"STATUS DO FINANCEIRO"', '""', '""', '"CONTAS 100% EQUILIBRADAS"']);
       }
 
+      // Se houver estornos, gera uma aba/bloco com o histórico de auditoria
+      const estornados = window.gastos.filter(g => g.estornado);
+      if (estornados.length > 0) {
+        linhas.push([]);
+        linhas.push(["--- HISTÓRICO DE AUDITORIA E ESTORNOS ---"]);
+        linhas.push(["Nº", "Item / Descrição", "Categoria", "Titular", "Valor (R$)", "Motivo Estorno"]);
+        estornados.forEach((g, idx) => {
+          linhas.push([idx + 1, `"${g.item.replace(/"/g, '""')}"`, `"${g.categoria}"`, `"${g.pessoa}"`, g.valor.toFixed(2).replace(".", ","), `"${(g.motivoEstorno || '').replace(/"/g, '""')}"`]);
+        });
+      }
+
       const csvContent = "\uFEFF" + linhas.map(l => l.join(";")).join("\r\n");
+      const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
       
-      // Compatibilidade de Download Mobile (Data-URI Fallback)
+      // Compatibilidade Universal de Download (Desktop + Mobile)
       const fileName = `Prestacao_Contas_Barco_${new Date().toISOString().slice(0, 10)}.csv`;
-      const encodedUri = "data:text/csv;charset=utf-8," + encodeURIComponent(csvContent);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = fileName;
+      a.target = "_blank";
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 100);
       
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", fileName);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      showToast("Planilha gerada com sucesso!");
+      showToast("Planilha Excel gerada!");
     }
 
     function copiarResumo() {
-      const total = window.gastos.reduce((s, g) => s + g.valor, 0);
-      const fausto = window.gastos.filter(g => g.pessoa === "Fausto").reduce((s, g) => s + g.valor, 0);
-      const leo = window.gastos.filter(g => g.pessoa === "Leonardo").reduce((s, g) => s + g.valor, 0);
+      const validos = window.gastos.filter(g => !g.estornado);
+      const total = validos.reduce((s, g) => s + g.valor, 0);
+      const fausto = validos.filter(g => g.pessoa === "Fausto").reduce((s, g) => s + g.valor, 0);
+      const leo = validos.filter(g => g.pessoa === "Leonardo").reduce((s, g) => s + g.valor, 0);
       const cota = total / 2;
       const diff = Math.abs(fausto - cota);
       const credor = diff < 0.01 ? null : (fausto > cota ? "Fausto" : "Leonardo");
@@ -668,7 +742,6 @@
         credor ? `👉 Acerto: ${devedor} deve ${formatBRL(diff)} para ${credor}` : "👉 Acerto: contas equilibradas!"
       ].join("\n");
 
-      // Suporte duplo à área de transferência para navegadores antigos/móveis
       if (navigator.clipboard && window.isSecureContext) {
         navigator.clipboard.writeText(txt).then(() => showToast("Copiado para o WhatsApp!")).catch(() => fallbackCopyTextToClipboard(txt));
       } else {
